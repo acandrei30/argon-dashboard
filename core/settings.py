@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'apps.tables',
     'apps.tasks',
     'apps.users',
+    'recruitment',
 
     'allauth',
     'allauth.account',

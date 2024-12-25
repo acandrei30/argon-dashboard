@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    {% for stage, caregivers in caregivers_by_stage.items %}
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>{{ stages|dict_get:stage }}</h5>
+          </div>
+          <div class="card-body">
+            {% for caregiver in caregivers %}
+              <div class="mb-3">
+                <h6>{{ caregiver.name|default:"Name not provided" }}</h6>
+                <p>Age: {{ caregiver.age|default:"N/A" }}</p>
+                <p>Experience: {{ caregiver.experience|default:"No experience provided" }}</p>
+              </div>
+            {% empty %}
+              <p>No caregivers in this stage.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}
+

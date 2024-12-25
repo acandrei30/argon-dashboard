@@ -199,6 +199,11 @@
             <span class="sidenav-normal"> Pricing </span>
           </a>
         </li>
+        <a href="{% url 'caregiver-pipeline' %}" class="nav-link {% if 'pipeline' in segment %}active{% endif %}">
+          <i class="ni ni-bullet-list-67 text-dark"></i>
+          <span class="nav-link-text">Caregiver Pipeline</span>
+        </a>
+        
         <li class="nav-item">
           <a href="{% url 'login' %}" class="nav-link">
             <span class="sidenav-mini-icon"> L </span>
