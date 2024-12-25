@@ -1,48 +1,46 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Add New Caregiver {% endblock title %}
+{% block title %} Caregiver Profile {% endblock title %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="row align-items-center py-4">
+    <div class="row">
         <div class="col-lg-6 col-7">
-            <h2 class="text-primary">Add New Caregiver</h2>
+            <h2 class="text-primary">Caregiver Profile</h2>
         </div>
         <div class="col-lg-6 col-5 text-right">
+            <!-- Example: Add a "Back to Pipeline" Button -->
             <a href="{% url 'caregiver-pipeline' %}" class="btn btn-sm btn-primary">
                 <i class="ni ni-bold-left"></i> Back to Pipeline
             </a>
         </div>
     </div>
-
-    <!-- Form Section -->
     <div class="row mt-4">
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0">Caregiver Details</h3>
+                    <h3 class="mb-0">Edit Caregiver Details</h3>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter caregiver name" required>
+                            <input type="text" id="name" name="name" class="form-control" value="{{ caregiver.name }}" required>
                         </div>
                         <div class="form-group">
                             <label for="age">Age</label>
-                            <input type="number" id="age" name="age" class="form-control" placeholder="Enter caregiver age" required>
+                            <input type="number" id="age" name="age" class="form-control" value="{{ caregiver.age }}" required>
                         </div>
                         <div class="form-group">
                             <label for="experience">Experience</label>
-                            <input type="text" id="experience" name="experience" class="form-control" placeholder="Enter caregiver experience" required>
+                            <input type="text" id="experience" name="experience" class="form-control" value="{{ caregiver.experience }}" required>
                         </div>
                         <div class="form-group">
                             <label for="salary_expectation">Salary Expectation</label>
-                            <input type="text" id="salary_expectation" name="salary_expectation" class="form-control" placeholder="Enter salary expectation" required>
+                            <input type="text" id="salary_expectation" name="salary_expectation" class="form-control" value="{{ caregiver.salary_expectation }}" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Caregiver</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
                 </div>
             </div>

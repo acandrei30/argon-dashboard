@@ -3,6 +3,20 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+  <!-- Header Section with Add Caregiver Button -->
+  <div class="row align-items-center py-4">
+    <div class="col-lg-6 col-7">
+      <h2 class="text-primary">Caregiver Pipeline</h2>
+    </div>
+    <div class="col-lg-6 col-5 text-right">
+      <!-- Add New Caregiver Button -->
+      <a href="{% url 'add_caregiver' %}" class="btn btn-sm btn-primary">
+        <i class="ni ni-fat-add"></i> Add New Caregiver
+      </a>
+    </div>
+  </div>
+
+  <!-- Pipeline Cards -->
   <div class="row">
     {% for stage, caregivers in caregivers_by_stage.items %}
       <div class="col-md-4">
@@ -13,9 +27,8 @@
           <div class="card-body">
             {% for caregiver in caregivers %}
               <div class="mb-3">
-                <h6>{{ caregiver.name|default:"Name not provided" }}</h6>
-                <p>Age: {{ caregiver.age|default:"N/A" }}</p>
-                <p>Experience: {{ caregiver.experience|default:"No experience provided" }}</p>
+                <!-- Link to Caregiver's Profile -->
+                <a href="{% url 'caregiver_profile' caregiver.id %}">{{ caregiver.name }}</a>
               </div>
             {% empty %}
               <p>No caregivers in this stage.</p>
@@ -27,4 +40,3 @@
   </div>
 </div>
 {% endblock content %}
-

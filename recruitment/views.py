@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Caregiver, PipelineStage
 
 # Caregiver Pipeline View
@@ -22,28 +22,26 @@ def caregiver_pipeline(request):
         "caregivers_by_stage": caregivers_by_stage,
         "stages": stages,
     })
-# Add Caregiver View
+
 def add_caregiver(request):
     if request.method == "POST":
-        # Collect caregiver details from the form
         name = request.POST.get("name")
         age = request.POST.get("age")
         experience = request.POST.get("experience")
         salary_expectation = request.POST.get("salary_expectation")
 
-        # Create a new caregiver record
+        # Create a new caregiver
         Caregiver.objects.create(
             name=name,
             age=age,
             experience=experience,
             salary_expectation=salary_expectation,
-            stage=PipelineStage.LEAD  # Set the initial stage to "Lead"
+            stage=PipelineStage.LEAD
         )
 
-        # Redirect to the pipeline view after adding
-        return redirect("pipeline")
+        # Redirect to the caregiver pipeline view
+        return redirect("caregiver-pipeline")
 
-    # Render the "Add Caregiver" form page for GET requests
     return render(request, "recruitment/add_caregiver.html")
 
 # Update Caregiver Stage View
@@ -52,4 +50,19 @@ def update_stage(request, caregiver_id, new_stage):
     if new_stage in PipelineStage.values:
         caregiver.stage = new_stage
         caregiver.save()
-    return redirect("pipeline")
+    return redirect("caregiver-pipeline")
+
+def caregiver_profile(request, caregiver_id):
+    # Fetch the caregiver based on their ID
+    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+
+    if request.method == "POST":
+        # Update caregiver details if the form is submitted
+        caregiver.name = request.POST.get("name", caregiver.name)
+        caregiver.age = request.POST.get("age", caregiver.age)
+        caregiver.experience = request.POST.get("experience", caregiver.experience)
+        caregiver.salary_expectation = request.POST.get("salary_expectation", caregiver.salary_expectation)
+        caregiver.save()
+        return redirect("caregiver-pipeline")
+
+    return render(request, "recruitment/caregiver_profile.html", {"caregiver": caregiver})
