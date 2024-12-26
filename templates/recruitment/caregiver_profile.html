@@ -3,19 +3,24 @@
 {% block title %} Caregiver Profile {% endblock title %}
 
 {% block content %}
+
 <div class="container-fluid py-4">
-    <div class="row">
+    <!-- Header -->
+    <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
             <h2 class="text-primary">Caregiver Profile</h2>
         </div>
         <div class="col-lg-6 col-5 text-right">
-            <!-- Example: Add a "Back to Pipeline" Button -->
+            <!-- Back to Pipeline Button -->
             <a href="{% url 'caregiver-pipeline' %}" class="btn btn-sm btn-primary">
                 <i class="ni ni-bold-left"></i> Back to Pipeline
             </a>
         </div>
     </div>
-    <div class="row mt-4">
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Edit Form -->
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header">
@@ -45,6 +50,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sidebar for Current Stage and Next Action -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Current Stage</h4>
+                </div>
+                <div class="card-body">
+                    <span class="badge badge-info">{{ caregiver.stage }}</span>
+                </div>
+            </div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Next Action</h4>
+                </div>
+                <div class="card-body">
+                    {% if next_action_label and next_stage %}
+                    <form method="POST" action="{% url 'update-stage' caregiver.id next_stage %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted">No further actions available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}
+
+

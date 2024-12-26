@@ -7,4 +7,5 @@ urlpatterns = [
     path('add_caregiver/', views.add_caregiver, name='add_caregiver'),
     path('caregiver/<int:caregiver_id>/', views.caregiver_profile, name='caregiver_profile'),
     
+    
 ]

@@ -46,22 +46,35 @@ def add_caregiver(request):
 
 # Update Caregiver Stage View
 def update_stage(request, caregiver_id, new_stage):
+    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+
     if request.method == "POST":
-        caregiver = get_object_or_404(Caregiver, id=caregiver_id)
-        if new_stage in PipelineStage.values:
-            caregiver.stage = new_stage
-            caregiver.save()
-            return JsonResponse({"message": "Caregiver stage updated successfully."})
-        return JsonResponse({"error": "Invalid stage."}, status=400)
+        caregiver.stage = new_stage
+        caregiver.save()
+        return redirect("caregiver_profile", caregiver_id=caregiver.id)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
 def caregiver_profile(request, caregiver_id):
-    # Fetch the caregiver based on their ID
     caregiver = get_object_or_404(Caregiver, id=caregiver_id)
 
+    # Define the pipeline stages in order
+    stages = [
+        PipelineStage.LEAD,
+        PipelineStage.INTERVIEW_COMPLETED,
+        PipelineStage.TRAINING_COMPLETED,
+        PipelineStage.BACKGROUND_CHECKED,
+        PipelineStage.READY_TO_WORK,
+    ]
+
+    # Determine the current and next stage
+    current_stage_index = stages.index(caregiver.stage) if caregiver.stage in stages else -1
+    next_stage = stages[current_stage_index + 1] if current_stage_index + 1 < len(stages) else None
+
+    # Label for the button
+    next_action_label = f"Move to {next_stage}" if next_stage else None
+
     if request.method == "POST":
-        # Update caregiver details if the form is submitted
         caregiver.name = request.POST.get("name", caregiver.name)
         caregiver.age = request.POST.get("age", caregiver.age)
         caregiver.experience = request.POST.get("experience", caregiver.experience)
@@ -69,4 +82,8 @@ def caregiver_profile(request, caregiver_id):
         caregiver.save()
         return redirect("caregiver-pipeline")
 
-    return render(request, "recruitment/caregiver_profile.html", {"caregiver": caregiver})
+    return render(request, "recruitment/caregiver_profile.html", {
+        "caregiver": caregiver,
+        "next_action_label": next_action_label,
+        "next_stage": next_stage,
+    })
