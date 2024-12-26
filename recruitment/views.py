@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from .models import Caregiver, PipelineStage
 
 # Caregiver Pipeline View
 def caregiver_pipeline(request):
-    # Define the stages of the pipeline
     stages = {
         PipelineStage.LEAD: "Lead",
         PipelineStage.INTERVIEW_COMPLETED: "Interview Completed",
@@ -12,17 +12,16 @@ def caregiver_pipeline(request):
         PipelineStage.READY_TO_WORK: "Ready to Work",
     }
 
-    # Prepare caregivers grouped by stage as a dictionary
     caregivers_by_stage = {
         stage: Caregiver.objects.filter(stage=stage) for stage in stages.keys()
     }
 
-    # Render the pipeline page
     return render(request, "recruitment/pipeline.html", {
         "caregivers_by_stage": caregivers_by_stage,
         "stages": stages,
     })
 
+# Add Caregiver
 def add_caregiver(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -30,7 +29,6 @@ def add_caregiver(request):
         experience = request.POST.get("experience")
         salary_expectation = request.POST.get("salary_expectation")
 
-        # Create a new caregiver
         Caregiver.objects.create(
             name=name,
             age=age,
@@ -39,7 +37,6 @@ def add_caregiver(request):
             stage=PipelineStage.LEAD
         )
 
-        # Redirect to the caregiver pipeline view
         return redirect("caregiver-pipeline")
 
     return render(request, "recruitment/add_caregiver.html")
@@ -47,14 +44,14 @@ def add_caregiver(request):
 # Update Caregiver Stage View
 def update_stage(request, caregiver_id, new_stage):
     caregiver = get_object_or_404(Caregiver, id=caregiver_id)
-
-    if request.method == "POST":
+    if request.method == "POST" and new_stage in PipelineStage.values:
         caregiver.stage = new_stage
         caregiver.save()
         return redirect("caregiver_profile", caregiver_id=caregiver.id)
 
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+    return JsonResponse({"error": "Invalid request."}, status=400)
 
+# Caregiver Profile View
 def caregiver_profile(request, caregiver_id):
     caregiver = get_object_or_404(Caregiver, id=caregiver_id)
 
@@ -67,12 +64,15 @@ def caregiver_profile(request, caregiver_id):
         PipelineStage.READY_TO_WORK,
     ]
 
-    # Determine the current and next stage
-    current_stage_index = stages.index(caregiver.stage) if caregiver.stage in stages else -1
-    next_stage = stages[current_stage_index + 1] if current_stage_index + 1 < len(stages) else None
+    # Get current stage index
+    current_stage_index = stages.index(caregiver.stage)
 
-    # Label for the button
+    # Determine next and previous stages
+    next_stage = stages[current_stage_index + 1] if current_stage_index + 1 < len(stages) else None
+    previous_stage = stages[current_stage_index - 1] if current_stage_index > 0 else None
+
     next_action_label = f"Move to {next_stage}" if next_stage else None
+    previous_action_label = f"Move to {previous_stage}" if previous_stage else None
 
     if request.method == "POST":
         caregiver.name = request.POST.get("name", caregiver.name)
@@ -80,10 +80,39 @@ def caregiver_profile(request, caregiver_id):
         caregiver.experience = request.POST.get("experience", caregiver.experience)
         caregiver.salary_expectation = request.POST.get("salary_expectation", caregiver.salary_expectation)
         caregiver.save()
-        return redirect("caregiver-pipeline")
+        return redirect("caregiver_profile", caregiver_id=caregiver.id)
 
     return render(request, "recruitment/caregiver_profile.html", {
         "caregiver": caregiver,
-        "next_action_label": next_action_label,
         "next_stage": next_stage,
+        "next_action_label": next_action_label,
+        "previous_stage": previous_stage,
+        "previous_action_label": previous_action_label,
     })
+
+# Move Backward in Stage
+def move_backward_stage(request, caregiver_id):
+    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+
+    stages = [
+        PipelineStage.LEAD,
+        PipelineStage.INTERVIEW_COMPLETED,
+        PipelineStage.TRAINING_COMPLETED,
+        PipelineStage.BACKGROUND_CHECKED,
+        PipelineStage.READY_TO_WORK,
+    ]
+
+    current_index = stages.index(caregiver.stage)
+    if current_index > 0:
+        caregiver.stage = stages[current_index - 1]
+        caregiver.save()
+
+    return redirect("caregiver_profile", caregiver_id=caregiver.id)
+
+# Archive Caregiver
+def archive_caregiver(request, caregiver_id):
+    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+    if request.method == "POST":
+        caregiver.delete()
+        return redirect("caregiver-pipeline")
+    return JsonResponse({"error": "Invalid request method."}, status=405)
