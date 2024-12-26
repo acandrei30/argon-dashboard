@@ -6,10 +6,10 @@ def caregiver_pipeline(request):
     # Define the stages of the pipeline
     stages = {
         PipelineStage.LEAD: "Lead",
+        PipelineStage.INTERVIEW_COMPLETED: "Interview Completed",
         PipelineStage.TRAINING_COMPLETED: "Training Completed",
-        PipelineStage.BACKGROUND_CHECK: "Background Check",
-        PipelineStage.UNASSIGNED: "Unassigned Caregiver",
-        PipelineStage.ACTIVE: "Active Caregiver",
+        PipelineStage.BACKGROUND_CHECKED: "Background Checked",
+        PipelineStage.READY_TO_WORK: "Ready to Work",
     }
 
     # Prepare caregivers grouped by stage as a dictionary
@@ -46,11 +46,15 @@ def add_caregiver(request):
 
 # Update Caregiver Stage View
 def update_stage(request, caregiver_id, new_stage):
-    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
-    if new_stage in PipelineStage.values:
-        caregiver.stage = new_stage
-        caregiver.save()
-    return redirect("caregiver-pipeline")
+    if request.method == "POST":
+        caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+        if new_stage in PipelineStage.values:
+            caregiver.stage = new_stage
+            caregiver.save()
+            return JsonResponse({"message": "Caregiver stage updated successfully."})
+        return JsonResponse({"error": "Invalid stage."}, status=400)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 def caregiver_profile(request, caregiver_id):
     # Fetch the caregiver based on their ID

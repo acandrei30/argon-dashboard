@@ -1,11 +1,11 @@
 from django.db import models
 
 class PipelineStage(models.TextChoices):
-    LEAD = 'Lead'
-    TRAINING_COMPLETED = 'Training Completed'
-    BACKGROUND_CHECK = 'Background Check'
-    UNASSIGNED = 'Unassigned Caregiver'
-    ACTIVE = 'Active Caregiver'
+    LEAD = 'Lead', 'Lead'
+    INTERVIEW_COMPLETED = 'Interview Completed', 'Interview Completed'
+    TRAINING_COMPLETED = 'Training Completed', 'Training Completed'
+    BACKGROUND_CHECKED = 'Background Checked', 'Background Checked'
+    READY_TO_WORK = 'Ready to Work', 'Ready to Work'
 
 class Caregiver(models.Model):
     name = models.CharField(max_length=100)

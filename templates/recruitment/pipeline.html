@@ -1,5 +1,6 @@
 {% extends "layouts/base.html" %}
 {% load custom_filters %}
+{% load static %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -24,9 +25,15 @@
           <div class="card-header">
             <h5>{{ stages|dict_get:stage }}</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body"
+               id="stage-{{ stage }}"
+               ondragover="allowDrop(event)"
+               ondrop="handleDrop(event, '{{ stage }}')">
             {% for caregiver in caregivers %}
-              <div class="mb-3">
+              <div class="mb-3 caregiver-card"
+                   id="caregiver-{{ caregiver.id }}"
+                   draggable="true"
+                   ondragstart="handleDragStart(event, '{{ caregiver.id }}')">
                 <!-- Link to Caregiver's Profile -->
                 <a href="{% url 'caregiver_profile' caregiver.id %}">{{ caregiver.name }}</a>
               </div>
@@ -40,3 +47,7 @@
   </div>
 </div>
 {% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'assets/js/pipeline.js' %}" defer></script>
+{% endblock javascripts %}
