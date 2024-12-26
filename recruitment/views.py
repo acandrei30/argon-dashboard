@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import Caregiver, PipelineStage
+from .models import Caregiver, PipelineStage, CaregiverNotes
 
 # Caregiver Pipeline View
 def caregiver_pipeline(request):
@@ -55,6 +56,9 @@ def update_stage(request, caregiver_id, new_stage):
 def caregiver_profile(request, caregiver_id):
     caregiver = get_object_or_404(Caregiver, id=caregiver_id)
 
+    # Fetch related notes
+    notes = caregiver.notes.all()  # Use the related_name "notes" from the CaregiverNotes model
+
     # Define the pipeline stages in order
     stages = [
         PipelineStage.LEAD,
@@ -84,6 +88,7 @@ def caregiver_profile(request, caregiver_id):
 
     return render(request, "recruitment/caregiver_profile.html", {
         "caregiver": caregiver,
+        "notes": notes,  # Pass notes to the template
         "next_stage": next_stage,
         "next_action_label": next_action_label,
         "previous_stage": previous_stage,
@@ -115,4 +120,19 @@ def archive_caregiver(request, caregiver_id):
     if request.method == "POST":
         caregiver.delete()
         return redirect("caregiver-pipeline")
+    return JsonResponse({"error": "Invalid request method."}, status=405)
+
+# Add notes
+def add_notes(request, caregiver_id):
+    caregiver = get_object_or_404(Caregiver, id=caregiver_id)
+    if request.method == "POST":
+        notes = request.POST.get("notes", "")
+        file = request.FILES.get("files")
+
+        # Save notes and files to the database or a file system
+        # Example: Save notes to a hypothetical `CaregiverNotes` model
+        if notes or file:
+            CaregiverNotes.objects.create(caregiver=caregiver, notes=notes, file=file)
+
+        return redirect("caregiver_profile", caregiver_id=caregiver.id)
     return JsonResponse({"error": "Invalid request method."}, status=405)

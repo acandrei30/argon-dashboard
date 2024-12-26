@@ -17,3 +17,17 @@ class Caregiver(models.Model):
         choices=PipelineStage.choices,
         default=PipelineStage.LEAD
     )
+
+    def __str__(self):
+        return self.name
+
+class CaregiverNotes(models.Model):
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE, related_name="notes")
+    notes = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='caregiver_files/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notes for {self.caregiver.name} (Created on {self.created_at})"
+
+from .models import Caregiver, PipelineStage, CaregiverNotes
