@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'apps.tasks',
     'apps.users',
     'recruitment',
+    'sales_pipeline',
 
     'allauth',
     'allauth.account',

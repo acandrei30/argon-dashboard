@@ -30,4 +30,3 @@ class CaregiverNotes(models.Model):
     def __str__(self):
         return f"Notes for {self.caregiver.name} (Created on {self.created_at})"
 
-from .models import Caregiver, PipelineStage, CaregiverNotes

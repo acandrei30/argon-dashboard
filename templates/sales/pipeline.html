@@ -1,0 +1,45 @@
+{% extends "layouts/base.html" %}
+{% load custom_filters %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section with Add Lead Button -->
+  <div class="row align-items-center py-4">
+    <div class="col-lg-6 col-7">
+      <h2 class="text-primary">Sales Pipeline</h2>
+    </div>
+    <div class="col-lg-6 col-5 text-right">
+      <!-- Add New Lead Button -->
+      <a href="{% url 'add-lead' %}" class="btn btn-sm btn-primary">
+        <i class="ni ni-fat-add"></i> Add New Lead
+      </a>
+    </div>
+  </div>
+
+  <!-- Pipeline Stages in Flex Row -->
+  <div class="d-flex flex-wrap justify-content-between">
+    {% for stage, leads in leads_by_stage.items %}
+      <div class="card mx-2 flex-grow-1" style="min-width: 200px; max-width: calc(100% / 6 - 20px);">
+        <div class="card-header text-center">
+          <h5>{{ stages|dict_get:stage }}</h5>
+        </div>
+        <div class="card-body">
+          {% if leads %}
+            <ul class="list-group">
+              {% for lead in leads %}
+                <li class="list-group-item">
+                  <!-- Link to Lead's Profile -->
+                  <a href="{% url 'lead-profile' lead.id %}">{{ lead.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted text-center">No leads in this stage.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

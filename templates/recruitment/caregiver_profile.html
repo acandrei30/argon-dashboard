@@ -6,9 +6,13 @@
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
-            <h2 class="text-primary">Caregiver Profile</h2>
-        </div>
+      <div class="col-lg-6 col-7">
+        <h1 class="text-primary d-inline">
+            {{ caregiver.name }}
+        </h1>
+     
+    </div>
+    
         <div class="col-lg-6 col-5 text-right">
             <!-- Back to Pipeline Button -->
             <a href="{% url 'caregiver-pipeline' %}" class="btn btn-sm btn-primary">
@@ -54,60 +58,48 @@
         <div class="col-xl-4">
             <!-- Current Stage -->
             <div class="card">
-                <div class="card-header">
-                    <h4>Current Stage</h4>
-                </div>
-                <div class="card-body">
-                    <span class="badge badge-info">{{ caregiver.stage }}</span>
-                </div>
-            </div>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                  <h4>Current Stage</h4>
+                  <span class="badge badge-info">{{ caregiver.stage }}</span>
+              </div>
+          </div>
+          
 
-            <!-- Next Action -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4>Next Action</h4>
-                </div>
-                <div class="card-body">
-                    {% if next_action_label and next_stage %}
-                    <form method="POST" action="{% url 'update-stage' caregiver.id next_stage %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
-                    </form>
-                    {% else %}
-                    <p class="text-muted">No further actions available.</p>
-                    {% endif %}
+          <div class="card mt-4">
+            <div class="card-header">
+                <h4>Actions</h4>
+            </div>
+            <div class="card-body">
+                <!-- Next Action Button -->
+                {% if next_action_label and next_stage %}
+                <form method="POST" action="{% url 'update-stage' caregiver.id next_stage %}" class="d-inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
+                </form>
+                {% endif %}
+        
+                <!-- Dropdown for Other Actions -->
+                <div class="dropdown d-inline-block ml-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Other
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
+                        {% if previous_stage %}
+                        <form method="POST" action="{% url 'update-stage' caregiver.id previous_stage %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+                        </form>
+                        {% endif %}
+                        <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger">Archive Caregiver</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-
-            <!-- Previous Action -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4>Previous Action</h4>
-                </div>
-                <div class="card-body">
-                    {% if previous_stage %}
-                    <form method="POST" action="{% url 'update-stage' caregiver.id previous_stage %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-warning">Move to {{ previous_stage }}</button>
-                    </form>
-                    {% else %}
-                    <p class="text-muted">No previous actions available.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Archive Caregiver -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4>Archive Caregiver</h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Archive Caregiver</button>
-                    </form>
-                </div>
-            </div>
+        </div>
+        
+        
 
             <!-- Notes and Files -->
             <div class="card mt-4">

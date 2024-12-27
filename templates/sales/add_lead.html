@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Add New Lead {% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+            <h2 class="text-primary">Add New Lead</h2>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
+                <i class="ni ni-bold-left"></i> Back to Pipeline
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row mt-4">
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Lead Details</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter lead name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter lead email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter lead phone number">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add 
+                            {% endblock content %}

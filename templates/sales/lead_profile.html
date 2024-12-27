@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Lead Profile {% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+            <h1 class="text-primary d-inline">
+                {{ lead.name }}
+            </h1>
+        </div>
+
+        <div class="col-lg-6 col-5 text-right">
+            <!-- Back to Pipeline Button -->
+            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
+                <i class="ni ni-bold-left"></i> Back to Pipeline
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Edit Form -->
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Edit Lead Details</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" class="form-control" value="{{ lead.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" value="{{ lead.email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" class="form-control" value="{{ lead.phone }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar for Current Stage -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Current Stage</h4>
+                    <span class="badge badge-info">{{ lead.get_stage_display }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
