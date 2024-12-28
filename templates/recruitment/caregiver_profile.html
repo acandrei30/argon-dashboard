@@ -7,10 +7,7 @@
     <!-- Header -->
     <div class="row align-items-center py-4">
       <div class="col-lg-6 col-7">
-        <h1 class="text-primary d-inline">
-            {{ caregiver.name }}
-        </h1>
-     
+        <h1 class="text-primary d-inline">{{ caregiver.name }}</h1>
     </div>
     
         <div class="col-lg-6 col-5 text-right">
@@ -23,7 +20,7 @@
 
     <!-- Main Content -->
     <div class="row">
-        <!-- Edit Form -->
+        <!-- Caregiver Details Form -->
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header">
@@ -58,50 +55,47 @@
         <div class="col-xl-4">
             <!-- Current Stage -->
             <div class="card">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>Current Stage</h4>
-                  <span class="badge badge-info">{{ caregiver.stage }}</span>
-              </div>
-          </div>
-          
-
-          <div class="card mt-4">
-            <div class="card-header">
-                <h4>Actions</h4>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Current Stage</h4>
+                    <span class="badge badge-info">{{ caregiver.stage }}</span>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- Next Action Button -->
-                {% if next_action_label and next_stage %}
-                <form method="POST" action="{% url 'update-stage' caregiver.id next_stage %}" class="d-inline-block">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
-                </form>
-                {% endif %}
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Actions</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Action Button to move stages -->
+                    {% if next_action_label and next_stage %}
+                    <form method="POST" action="{% url 'caregiver-update-stage' caregiver.id next_stage %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
+                    </form>
+                    {% endif %}
         
-                <!-- Dropdown for Other Actions -->
-                <div class="dropdown d-inline-block ml-2">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Other
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
-                        {% if previous_stage %}
-                        <form method="POST" action="{% url 'update-stage' caregiver.id previous_stage %}">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
-                        </form>
-                        {% endif %}
-                        <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item text-danger">Archive Caregiver</button>
-                        </form>
+                    <!-- Dropdown for Other Actions -->
+                    <div class="dropdown d-inline-block ml-2">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Other
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
+                            {% if previous_stage %}
+                            <form method="POST" action="{% url 'update-stage' caregiver.id previous_stage %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">Archive Caregiver</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        
-
-            <!-- Notes and Files -->
+            
+            <!-- Notes Section -->
             <div class="card mt-4">
                 <div class="card-header">
                     <h4>Notes and Files</h4>
@@ -123,28 +117,28 @@
             </div>
 
             <!-- Notes Section -->
-<div class="card mt-4">
-  <div class="card-header">
-      <h4>Notes</h4>
-  </div>
-  <div class="card-body">
-      {% if notes %}
-          <ul class="list-group">
-              {% for note in notes %}
-                  <li class="list-group-item">
-                      <p>{{ note.notes }}</p>
-                      {% if note.file %}
-                          <a href="{{ note.file.url }}" target="_blank">Download Attached File</a>
-                      {% endif %}
-                      <small class="text-muted">Added on: {{ note.created_at }}</small>
-                  </li>
-              {% endfor %}
-          </ul>
-      {% else %}
-          <p class="text-muted">No notes available for this caregiver.</p>
-      {% endif %}
-  </div>
-</div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Notes</h4>
+                </div>
+                <div class="card-body">
+                    {% if notes %}
+                        <ul class="list-group">
+                            {% for note in notes %}
+                                <li class="list-group-item">
+                                    <p>{{ note.notes }}</p>
+                                    {% if note.file %}
+                                        <a href="{{ note.file.url }}" target="_blank">Download Attached File</a>
+                                    {% endif %}
+                                    <small class="text-muted">Added on: {{ note.created_at }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No notes available for this caregiver.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

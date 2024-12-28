@@ -31,17 +31,24 @@ def add_lead(request):
         email = request.POST.get("email")
         location = request.POST.get("location")
         
+        # Debug: Print the data to the console
+        print("Received data:", name, phone, email, location)
+        
         # Create a new Lead object with the updated fields
-        Lead.objects.create(
+        lead = Lead.objects.create(
             name=name,
             phone=phone,
             email=email,
             location=location,
         )
 
+        # Debug: Check if lead was created
+        print("Lead created:", lead)
+
         return redirect("sales-pipeline")  # Redirect to the sales pipeline after saving the lead
 
     return render(request, "sales/add_lead.html")  # Render the form template
+
 
 # Update Lead Stage View
 def update_stage(request, lead_id, new_stage):

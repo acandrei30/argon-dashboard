@@ -15,7 +15,11 @@ class Lead(models.Model):
     phone = models.CharField(max_length=15)
     email = models.EmailField()
     location = models.CharField(max_length=255, default="Unknown")  # Default value for location
-    stage = models.CharField(max_length=50)
+    stage = models.CharField(
+        max_length=50,
+        choices=SalesPipelineStage.choices,  # Use the SalesPipelineStage choices
+        default=SalesPipelineStage.PROSPECTING  # Default stage for new leads
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

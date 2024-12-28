@@ -1,0 +1,44 @@
+<!-- _lead_notes.html -->
+<div class="card mt-4">
+  <div class="card-header">
+      <h4>Notes and Files</h4>
+  </div>
+  <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" action="{% url 'add-notes' lead.id %}">
+          {% csrf_token %}
+          <div class="form-group">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Enter notes for this lead"></textarea>
+          </div>
+          <div class="form-group">
+              <label for="files">Attach Files</label>
+              <input type="file" name="files" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-info">Save Notes</button>
+      </form>
+  </div>
+</div>
+
+<!-- Notes Section -->
+<div class="card mt-4">
+  <div class="card-header">
+      <h4>Notes</h4>
+  </div>
+  <div class="card-body">
+      {% if notes %}
+          <ul class="list-group">
+              {% for note in notes %}
+                  <li class="list-group-item">
+                      <p>{{ note.notes }}</p>
+                      {% if note.file %}
+                          <a href="{{ note.file.url }}" target="_blank">Download Attached File</a>
+                      {% endif %}
+                      <small class="text-muted">Added on: {{ note.created_at }}</small>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <p class="text-muted">No notes available for this lead.</p>
+      {% endif %}
+  </div>
+</div>
