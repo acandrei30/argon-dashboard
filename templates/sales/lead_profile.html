@@ -6,12 +6,12 @@
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
-            <h1 class="text-primary d-inline">
-                {{ lead.name }}
-            </h1>
-        </div>
-
+      <div class="col-lg-6 col-7">
+        <h1 class="text-primary d-inline">
+            {{ lead.name }}
+        </h1>
+    </div>
+    
         <div class="col-lg-6 col-5 text-right">
             <!-- Back to Pipeline Button -->
             <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
@@ -32,16 +32,20 @@
                     <form method="POST">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="name">Name</label>
+                            <label for="name">Lead Name</label>
                             <input type="text" id="name" name="name" class="form-control" value="{{ lead.name }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" class="form-control" value="{{ lead.email }}" required>
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" class="form-control" value="{{ lead.company }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Phone</label>
-                            <input type="text" id="phone" name="phone" class="form-control" value="{{ lead.phone }}">
+                            <label for="contact_info">Contact Information</label>
+                            <input type="text" id="contact_info" name="contact_info" class="form-control" value="{{ lead.contact_info }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="deal_value">Deal Value</label>
+                            <input type="text" id="deal_value" name="deal_value" class="form-control" value="{{ lead.deal_value }}" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
@@ -49,14 +53,97 @@
             </div>
         </div>
 
-        <!-- Sidebar for Current Stage -->
+        <!-- Sidebar for Actions -->
         <div class="col-xl-4">
+            <!-- Current Stage -->
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Current Stage</h4>
-                    <span class="badge badge-info">{{ lead.get_stage_display }}</span>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                  <h4>Current Stage</h4>
+                  <span class="badge badge-info">{{ lead.stage }}</span>
+              </div>
+          </div>
+          
+
+          <div class="card mt-4">
+            <div class="card-header">
+                <h4>Actions</h4>
+            </div>
+            <div class="card-body">
+                <!-- Next Action Button -->
+                {% if next_action_label and next_stage %}
+                <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
+                </form>
+                {% endif %}
+        
+                <!-- Dropdown for Other Actions -->
+                <div class="dropdown d-inline-block ml-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Other
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
+                        {% if previous_stage %}
+                        <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+                        </form>
+                        {% endif %}
+                        <form method="POST" action="{% url 'archive-lead' lead.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        
+
+            <!-- Notes and Files -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Notes and Files</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'add-notes' lead.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Enter notes for this lead"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="files">Attach Files</label>
+                            <input type="file" name="files" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-info">Save Notes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+<div class="card mt-4">
+  <div class="card-header">
+      <h4>Notes</h4>
+  </div>
+  <div class="card-body">
+      {% if notes %}
+          <ul class="list-group">
+              {% for note in notes %}
+                  <li class="list-group-item">
+                      <p>{{ note.notes }}</p>
+                      {% if note.file %}
+                          <a href="{{ note.file.url }}" target="_blank">Download Attached File</a>
+                      {% endif %}
+                      <small class="text-muted">Added on: {{ note.created_at }}</small>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <p class="text-muted">No notes available for this lead.</p>
+      {% endif %}
+  </div>
+</div>
         </div>
     </div>
 </div>

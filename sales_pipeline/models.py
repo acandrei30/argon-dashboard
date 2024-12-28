@@ -1,6 +1,5 @@
 from django.db import models
 
-# Define the sales pipeline stages
 class SalesPipelineStage(models.TextChoices):
     PROSPECTING = 'Prospecting', 'Prospecting'
     CONSULTATION_SCHEDULED = 'Consultation Scheduled', 'Consultation Scheduled'
@@ -9,18 +8,26 @@ class SalesPipelineStage(models.TextChoices):
     CAREGIVER_CONSIDERATION = 'Caregiver Consideration', 'Caregiver Consideration'
     READY_FOR_SERVICE = 'Ready for Service', 'Ready for Service'
 
-# Define the Lead model
+from django.db import models
+
 class Lead(models.Model):
     name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
     email = models.EmailField()
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    stage = models.CharField(
-        max_length=50,
-        choices=SalesPipelineStage.choices,
-        default=SalesPipelineStage.PROSPECTING
-    )
+    location = models.CharField(max_length=255, default="Unknown")  # Default value for location
+    stage = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} ({self.stage})"
+        return self.name
+
+
+class LeadNotes(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name="notes")
+    notes = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='lead_files/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notes for {self.lead.name} (Created on {self.created_at})"
