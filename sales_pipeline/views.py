@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import Lead, SalesPipelineStage, LeadNotes
 
-# Sales Pipeline View
 def sales_pipeline(request):
     stages = {
         SalesPipelineStage.PROSPECTING: "Prospecting",
@@ -13,13 +12,16 @@ def sales_pipeline(request):
         SalesPipelineStage.READY_FOR_SERVICE: "Ready for Service",
     }
 
+    # Fetch leads grouped by stage
     leads_by_stage = {
-        stage: Lead.objects.filter(stage=stage) for stage in stages.keys()
+        stage: list(Lead.objects.filter(stage=stage).values("id", "name", "consultation_datetime"))
+        for stage in stages.keys()
     }
 
     return render(request, "sales/pipeline.html", {
         "leads_by_stage": leads_by_stage,
         "stages": stages,
+        "SalesPipelineStage": SalesPipelineStage,  # Pass constants to template
     })
 
 # Add Lead

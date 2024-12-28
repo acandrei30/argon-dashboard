@@ -35,6 +35,13 @@
                  ondragstart="handleDragStart(event, '{{ lead.id }}')">
               <!-- Link to Lead's Profile -->
               <a href="{% url 'lead_profile' lead.id %}">{{ lead.name }}</a>
+              
+              <!-- Show Consultation Date and Time if Stage is 'Consultation Scheduled' -->
+              {% if stage == SalesPipelineStage.CONSULTATION_SCHEDULED and lead.consultation_datetime %}
+                <span class="badge badge-info mt-1">
+                  {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
+                </span>
+              {% endif %}
             </div>
           {% empty %}
             <p>No leads in this stage.</p>
@@ -44,7 +51,6 @@
     {% endfor %}
   </div>
 </div>
-
 {% endblock content %}
 
 {% block javascripts %}
