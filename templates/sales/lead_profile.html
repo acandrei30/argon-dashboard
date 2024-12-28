@@ -1,47 +1,128 @@
 {% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  <!-- Page plugins -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock extrastyle %}
 
 {% block title %} Lead Profile {% endblock title %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Header -->
+    <!-- Header Section with Lead Info -->
     <div class="row align-items-center py-4">
-      <div class="col-lg-6 col-7">
-        <h1 class="text-primary d-inline">
-            {{ lead.name }}
-        </h1>
-    </div>
-    
+        <div class="col-lg-6 col-7">
+            <h1 class="text-primary d-inline">{{ lead.name }}</h1>
+        </div>
         <div class="col-lg-6 col-5 text-right">
-            <!-- Current Stage Display -->
+            <!-- Current Stage and Back Button -->
             <span class="badge badge-info">{{ lead.stage }}</span>
-            <br><br>
-            <!-- Back to Pipeline Button -->
-            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
-                <i class="ni ni-bold-left"></i> Back to Pipeline
-            </a>
+            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Lead Form Section -->
     <div class="row">
-        <!-- Lead Form Section -->
         <div class="col-xl-8">
             {% include 'sales/_lead_form.html' %}
         </div>
-
-        <!-- Sidebar for Actions and Notes -->
         <div class="col-xl-4">
-            <!-- Actions Section (without card) -->
-            <div>
-                {% include 'sales/_lead_actions.html' %}
-            </div>
-            <!-- Notes and Files Section (without card) -->
-            <div class="mt-4">
-            
-                {% include 'sales/_lead_notes.html' %}
-            </div>
+            {% include 'sales/_lead_actions.html' %}
+            {% include 'sales/_lead_notes.html' %}
         </div>
     </div>
+
+    <!-- Modal for Scheduling Consultation -->
+    {% include 'sales/consultation_modal.html' %}
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script> 
+  
+
+<script>
+  $(document).ready(function() {
+    // Initialize Flatpickr for date selection
+    flatpickr("#selected-date", {
+      dateFormat: "Y-m-d",  // Format for date (YYYY-MM-DD)
+      onChange: function(selectedDates, dateStr, instance) {
+        // Enable the time field and show the selected date text
+        $('#selected-time').prop('disabled', false);
+        $('#selected-date-text').text("You have selected: " + dateStr);
+
+        // Enable the save button once both date and time are selected
+        updateSaveButtonState();
+      }
+    });
+
+    // Initialize Flatpickr for time selection
+    flatpickr("#selected-time", {
+      enableTime: true,  // Enables time picking
+      noCalendar: true,  // Disables the calendar (since we are only selecting time)
+      dateFormat: "H:i",  // Format for time (Hour:Minute)
+      time_24hr: true,  // Use 24-hour format
+      onChange: function(selectedDates, dateStr, instance) {
+        // Enable save button once both date and time are selected
+        updateSaveButtonState();
+      }
+    });
+
+    // Enable the Save button only when both date and time are selected
+    function updateSaveButtonState() {
+      var dateSelected = $('#selected-date').val();
+      var timeSelected = $('#selected-time').val();
+      if (dateSelected && timeSelected) {
+        $('#save-consultation').prop('disabled', false);
+      } else {
+        $('#save-consultation').prop('disabled', true);
+      }
+    }
+
+    // Handle Save Consultation button click
+    $('#save-consultation').click(function() {
+      var consultationDate = $('#selected-date').val();  // Get the selected date
+      var consultationTime = $('#selected-time').val();  // Get the selected time
+      var consultationDatetime = consultationDate + ' ' + consultationTime;  // Combine date and time
+
+      // Debugging: Print the data
+      console.log("Consultation Date and Time:", consultationDatetime);
+
+      $.ajax({
+        url: '{% url "update-lead-consultation" lead.id %}',  // Correct URL
+        method: 'POST',
+        data: {
+          'consultation_datetime': consultationDatetime,  // Pass data
+          'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF token for security
+        },
+        success: function(response) {
+          $('#calendar-modal').modal('hide');
+          Swal.fire({
+            title: 'Consultation Scheduled!',
+            text: 'The consultation has been scheduled.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+        },
+        error: function(xhr, status, error) {
+          // Handle error in case of failure
+          Swal.fire({
+            title: 'Error',
+            text: 'There was an error scheduling the consultation.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      });
+    });
+  });
+</script>
+
+
+
+{% endblock extra_js %}
