@@ -28,6 +28,20 @@
             {% include 'sales/_lead_form.html' %}
         </div>
         <div class="col-xl-4">
+            <!-- Right Sidebar Section -->
+            <div class="card">
+                <div class="card-body">
+                    <h5>Consultation Date & Time</h5>
+                    <p id="consultation-datetime">
+                        {% if lead.consultation_datetime %}
+                          {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
+                          <button id="edit-consultation" class="btn btn-sm btn-secondary">Edit</button>
+                        {% else %}
+                          Not Scheduled
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
             {% include 'sales/_lead_actions.html' %}
             {% include 'sales/_lead_notes.html' %}
         </div>
@@ -44,85 +58,114 @@
   <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
   <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
   <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script> 
-  
 
-<script>
-  $(document).ready(function() {
-    // Initialize Flatpickr for date selection
-    flatpickr("#selected-date", {
-      dateFormat: "Y-m-d",  // Format for date (YYYY-MM-DD)
-      onChange: function(selectedDates, dateStr, instance) {
-        // Enable the time field and show the selected date text
-        $('#selected-time').prop('disabled', false);
-        $('#selected-date-text').text("You have selected: " + dateStr);
-
-        // Enable the save button once both date and time are selected
-        updateSaveButtonState();
-      }
-    });
-
-    // Initialize Flatpickr for time selection
-    flatpickr("#selected-time", {
-      enableTime: true,  // Enables time picking
-      noCalendar: true,  // Disables the calendar (since we are only selecting time)
-      dateFormat: "H:i",  // Format for time (Hour:Minute)
-      time_24hr: true,  // Use 24-hour format
-      onChange: function(selectedDates, dateStr, instance) {
-        // Enable save button once both date and time are selected
-        updateSaveButtonState();
-      }
-    });
-
-    // Enable the Save button only when both date and time are selected
-    function updateSaveButtonState() {
-      var dateSelected = $('#selected-date').val();
-      var timeSelected = $('#selected-time').val();
-      if (dateSelected && timeSelected) {
-        $('#save-consultation').prop('disabled', false);
-      } else {
-        $('#save-consultation').prop('disabled', true);
-      }
-    }
-
-    // Handle Save Consultation button click
-    $('#save-consultation').click(function() {
-      var consultationDate = $('#selected-date').val();  // Get the selected date
-      var consultationTime = $('#selected-time').val();  // Get the selected time
-      var consultationDatetime = consultationDate + ' ' + consultationTime;  // Combine date and time
-
-      // Debugging: Print the data
-      console.log("Consultation Date and Time:", consultationDatetime);
-
-      $.ajax({
-        url: '{% url "update-lead-consultation" lead.id %}',  // Correct URL
-        method: 'POST',
-        data: {
-          'consultation_datetime': consultationDatetime,  // Pass data
-          'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF token for security
+  <script>
+    $(document).ready(function () {
+      // Initialize Flatpickr for date selection
+      flatpickr("#selected-date", {
+        dateFormat: "Y-m-d", // Format for date (YYYY-MM-DD)
+        onChange: function (selectedDates, dateStr, instance) {
+          $("#selected-time").prop("disabled", false);
+          $("#selected-date-text").text("You have selected: " + dateStr);
+          updateSaveButtonState();
         },
-        success: function(response) {
-          $('#calendar-modal').modal('hide');
-          Swal.fire({
-            title: 'Consultation Scheduled!',
-            text: 'The consultation has been scheduled.',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
+      });
+
+      // Initialize Flatpickr for time selection
+      flatpickr("#selected-time", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        onChange: function (selectedDates, dateStr, instance) {
+          updateSaveButtonState();
         },
-        error: function(xhr, status, error) {
-          // Handle error in case of failure
-          Swal.fire({
-            title: 'Error',
-            text: 'There was an error scheduling the consultation.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
+      });
+
+      function updateSaveButtonState() {
+        var dateSelected = $("#selected-date").val();
+        var timeSelected = $("#selected-time").val();
+        $("#save-consultation").prop("disabled", !dateSelected || !timeSelected);
+      }
+
+      // Save Consultation
+      $("#save-consultation").click(function () {
+        var consultationDate = $("#selected-date").val();
+        var consultationTime = $("#selected-time").val();
+        var consultationDatetime = consultationDate + " " + consultationTime;
+
+        $.ajax({
+          url: '{% url "update-lead-consultation" lead.id %}',
+          method: "POST",
+          data: {
+            consultation_datetime: consultationDatetime,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+          },
+          success: function (response) {
+            Swal.fire({
+              title: "Consultation Scheduled!",
+              text: "The consultation has been scheduled.",
+              icon: "success",
+              confirmButtonText: "Ok",
+            }).then(() => {
+              location.reload(); // Automatically refresh the page
+            });
+          },
+          error: function (xhr, status, error) {
+            Swal.fire({
+              title: "Error",
+              text: "There was an error scheduling the consultation.",
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          },
+        });
+      });
+
+      // Edit Consultation Date & Time
+      $(document).on("click", "#edit-consultation", function () {
+        var currentDatetime = $("#consultation-datetime").text().trim();
+        var editHtml = `
+          <input id="edit-date" class="form-control mb-2" type="date" value="${currentDatetime.split(' ')[0]}">
+          <input id="edit-time" class="form-control mb-2" type="time" value="${currentDatetime.split(' ')[1]}">
+          <button id="save-edited-consultation" class="btn btn-sm btn-success">Save</button>
+        `;
+        $("#consultation-datetime").html(editHtml);
+      });
+
+      // Save Edited Consultation Date & Time
+      $(document).on("click", "#save-edited-consultation", function () {
+        var newDate = $("#edit-date").val();
+        var newTime = $("#edit-time").val();
+        var newDatetime = `${newDate} ${newTime}`;
+
+        $.ajax({
+          url: '{% url "update-lead-consultation" lead.id %}',
+          method: "POST",
+          data: {
+            consultation_datetime: newDatetime,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+          },
+          success: function (response) {
+            Swal.fire({
+              title: "Updated!",
+              text: "The consultation date and time have been updated.",
+              icon: "success",
+              confirmButtonText: "Ok",
+            }).then(() => {
+              location.reload(); // Automatically refresh the page
+            });
+          },
+          error: function (xhr, status, error) {
+            Swal.fire({
+              title: "Error",
+              text: "There was an error updating the consultation date and time.",
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          },
+        });
       });
     });
-  });
-</script>
-
-
-
+  </script>
 {% endblock extra_js %}
