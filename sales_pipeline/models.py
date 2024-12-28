@@ -11,21 +11,45 @@ class SalesPipelineStage(models.TextChoices):
 from django.db import models
 
 class Lead(models.Model):
+    # Existing fields
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
-    location = models.CharField(max_length=255, default="Unknown")  # Default value for location
+    location = models.CharField(max_length=255, default="Unknown")
     stage = models.CharField(
         max_length=50,
-        choices=SalesPipelineStage.choices,  # Use the SalesPipelineStage choices
-        default=SalesPipelineStage.PROSPECTING  # Default stage for new leads
+        choices=SalesPipelineStage.choices,
+        default=SalesPipelineStage.PROSPECTING,
     )
+    consultation_datetime = models.DateTimeField(null=True, blank=True)
+
+    # New fields
+    relation = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        choices=[
+            ("mother", "Mother"),
+            ("father", "Father"),
+            ("grandmother", "Grandmother"),
+            ("grandfather", "Grandfather"),
+            ("friend", "Friend"),
+            ("aunt", "Aunt"),
+            ("uncle", "Uncle"),
+            ("sibling", "Sibling"),
+            ("other", "Other"),
+        ],
+    )
+    age = models.IntegerField(null=True, blank=True)  # Ensure this is present
+    medical_summary = models.TextField(null=True, blank=True)
+    services_required = models.TextField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    consultation_datetime = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
 
 
 class LeadNotes(models.Model):

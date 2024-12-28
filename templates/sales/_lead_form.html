@@ -1,28 +1,73 @@
-<!-- _lead_form.html -->
 <div class="card">
-  <div class="card-header">
-      <h3 class="mb-0">Edit Lead Details</h3>
+    <div class="card-header">
+        <h3 class="mb-0">Edit Lead Details</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Lead Name -->
+            <div class="form-group">
+                <label for="name">Lead Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ lead.name }}" required>
+            </div>
+            
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" name="phone" class="form-control" value="{{ lead.phone }}" required>
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ lead.email }}" required>
+            </div>
+            
+            <!-- Location -->
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" class="form-control" value="{{ lead.location }}" required>
+            </div>
+  
+            <!-- Relation -->
+            <div class="form-group">
+                <label for="relation">Relation</label>
+                <select id="relation" name="relation" class="form-control">
+                    <option value="" {% if not lead.relation %}selected{% endif %}>Select Relation</option>
+                    <option value="mother" {% if lead.relation == "mother" %}selected{% endif %}>Mother</option>
+                    <option value="father" {% if lead.relation == "father" %}selected{% endif %}>Father</option>
+                    <option value="grandmother" {% if lead.relation == "grandmother" %}selected{% endif %}>Grandmother</option>
+                    <option value="grandfather" {% if lead.relation == "grandfather" %}selected{% endif %}>Grandfather</option>
+                    <option value="friend" {% if lead.relation == "friend" %}selected{% endif %}>Friend</option>
+                    <option value="aunt" {% if lead.relation == "aunt" %}selected{% endif %}>Aunt</option>
+                    <option value="uncle" {% if lead.relation == "uncle" %}selected{% endif %}>Uncle</option>
+                    <option value="sibling" {% if lead.relation == "sibling" %}selected{% endif %}>Sibling</option>
+                    <option value="other" {% if lead.relation == "other" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+  
+            <!-- Age -->
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" class="form-control" value="{{ lead.age }}">
+            </div>
+  
+            <!-- Medical Summary -->
+            <div class="form-group">
+                <label for="medical_summary">Brief Medical Summary</label>
+                <textarea id="medical_summary" name="medical_summary" class="form-control" rows="3">{{ lead.medical_summary }}</textarea>
+            </div>
+  
+            <!-- Services Required -->
+            <div class="form-group">
+                <label for="services_required">Services Required</label>
+                <textarea id="services_required" name="services_required" class="form-control" rows="3">{{ lead.services_required }}</textarea>
+            </div>
+  
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
   </div>
-  <div class="card-body">
-      <form method="POST">
-          {% csrf_token %}
-          <div class="form-group">
-              <label for="name">Lead Name</label>
-              <input type="text" id="name" name="name" class="form-control" value="{{ lead.name }}" required>
-          </div>
-          <div class="form-group">
-              <label for="phone">Phone</label>
-              <input type="text" id="phone" name="phone" class="form-control" value="{{ lead.phone }}" required>
-          </div>
-          <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" class="form-control" value="{{ lead.email }}" required>
-          </div>
-          <div class="form-group">
-              <label for="location">Location</label>
-              <input type="text" id="location" name="location" class="form-control" value="{{ lead.location }}" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-      </form>
-  </div>
-</div>
+  

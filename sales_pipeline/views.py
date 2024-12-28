@@ -27,14 +27,18 @@ def sales_pipeline(request):
 # Add Lead
 def add_lead(request):
     if request.method == "POST":
-        # Get data from form
+        # Get data from the form
         name = request.POST.get("name")
         phone = request.POST.get("phone")
         email = request.POST.get("email")
         location = request.POST.get("location")
-        
+        relation = request.POST.get("relation")
+        age = request.POST.get("age")
+        medical_summary = request.POST.get("medical_summary")
+        services_required = request.POST.get("services_required")
+
         # Debug: Print the data to the console
-        print("Received data:", name, phone, email, location)
+        print("Received data:", name, phone, email, location, relation, age, medical_summary, services_required)
         
         # Create a new Lead object with the updated fields
         lead = Lead.objects.create(
@@ -42,14 +46,20 @@ def add_lead(request):
             phone=phone,
             email=email,
             location=location,
+            relation=relation,
+            age=age if age else None,  # Handle optional age
+            medical_summary=medical_summary,
+            services_required=services_required,
         )
 
         # Debug: Check if lead was created
         print("Lead created:", lead)
 
-        return redirect("sales-pipeline")  # Redirect to the sales pipeline after saving the lead
+        # Redirect to the sales pipeline after saving the lead
+        return redirect("sales-pipeline")
 
-    return render(request, "sales/add_lead.html")  # Render the form template
+    # Render the form template
+    return render(request, "sales/add_lead.html")
 
 
 # Update Lead Stage View
