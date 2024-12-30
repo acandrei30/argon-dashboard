@@ -59,29 +59,58 @@ def add_lead(request):
 
     return render(request, "sales/add_lead.html")
 
+from django.shortcuts import render, get_object_or_404, redirect
+from sales_pipeline.models import Lead, SalesPipelineStage
+
 def lead_profile(request, lead_id):
     """
     View to display the profile of a single lead.
     """
     lead = get_object_or_404(Lead, id=lead_id)
 
+    # Fetch related notes
+    notes = lead.notes.all()  # Use the related_name "notes" from the LeadNotes model
+
+    # Define the pipeline stages in order
+    stages = [
+        SalesPipelineStage.PROSPECTING,
+        SalesPipelineStage.CONSULTATION_SCHEDULED,
+        SalesPipelineStage.UNDER_CONSIDERATION,
+        SalesPipelineStage.CAREGIVER_INTERVIEW_SCHEDULED,
+        SalesPipelineStage.CAREGIVER_CONSIDERATION,
+        SalesPipelineStage.READY_FOR_SERVICE,
+    ]
+
+    # Get current stage index
+    current_stage_index = stages.index(lead.stage)
+
+    # Determine next and previous stages
+    next_stage = stages[current_stage_index + 1] if current_stage_index + 1 < len(stages) else None
+    previous_stage = stages[current_stage_index - 1] if current_stage_index > 0 else None
+
+    next_action_label = f"Move to {next_stage}" if next_stage else None
+    previous_action_label = f"Move to {previous_stage}" if previous_stage else None
+
     if request.method == "POST":
-        try:
-            # Update lead details
-            lead.name = request.POST.get("name", lead.name)
-            lead.phone = request.POST.get("phone", lead.phone)
-            lead.email = request.POST.get("email", lead.email)
-            lead.location = request.POST.get("location", lead.location)
-            lead.relation = request.POST.get("relation", lead.relation)
-            lead.age = request.POST.get("age", lead.age)
-            lead.medical_summary = request.POST.get("medical_summary", lead.medical_summary)
-            lead.services_required = request.POST.get("services_required", lead.services_required)
-            lead.save()
+        # Update lead details
+        lead.name = request.POST.get("name", lead.name)
+        lead.phone = request.POST.get("phone", lead.phone)
+        lead.email = request.POST.get("email", lead.email)
+        lead.location = request.POST.get("location", lead.location)
+        lead.relation = request.POST.get("relation", lead.relation)
+        lead.age = request.POST.get("age", lead.age)
+        lead.medical_summary = request.POST.get("medical_summary", lead.medical_summary)
+        lead.services_required = request.POST.get("services_required", lead.services_required)
+        lead.save()
 
-            return JsonResponse({"message": "Lead updated successfully!"}, status=200)
+        # Redirect back to the lead profile page
+        return redirect("lead_profile", lead_id=lead.id)
 
-        except Exception as e:
-            print("Error updating lead:", str(e))
-            return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
-
-    return render(request, "sales/lead_profile.html", {"lead": lead})
+    return render(request, "sales/lead_profile.html", {
+        "lead": lead,
+        "notes": notes,  # Pass notes to the template
+        "next_stage": next_stage,
+        "next_action_label": next_action_label,
+        "previous_stage": previous_stage,
+        "previous_action_label": previous_action_label,
+    })
