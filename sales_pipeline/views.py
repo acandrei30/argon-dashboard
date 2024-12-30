@@ -1,6 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import Lead, SalesPipelineStage, LeadNotes
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Lead  # Ensure Lead is imported
 
 def sales_pipeline(request):
     stages = {
@@ -183,4 +191,7 @@ def update_lead_consultation(request, lead_id):
         except Exception as e:
             print("Error:", e)
             return JsonResponse({"error": str(e)}, status=400)
+
+
+
 

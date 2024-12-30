@@ -33,25 +33,21 @@
                         <h4 class="text-primary">Payer</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Name -->
                         <div class="form-group">
                             <label for="name">Title / Name</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Enter name" required>
                         </div>
-                        <!-- Email -->
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter email">
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter email" required>
                         </div>
-                        <!-- Phone -->
                         <div class="form-group">
                             <label for="phone">Phone</label>
-                            <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number">
+                            <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number" required>
                         </div>
-                        <!-- Location -->
                         <div class="form-group">
                             <label for="location">Location</label>
-                            <input type="text" id="location" name="location" class="form-control" placeholder="Enter location">
+                            <input type="text" id="location" name="location" class="form-control" placeholder="Enter location" required>
                         </div>
                     </div>
                 </div>
@@ -64,10 +60,9 @@
                         <h4 class="text-primary">Receiver</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Relation with Payer -->
                         <div class="form-group">
                             <label for="relation">Relation with Payer</label>
-                            <select id="relation" name="relation" class="form-control">
+                            <select id="relation" name="relation" class="form-control" required>
                                 <option value="" disabled selected>Select relation</option>
                                 <option value="mother">Mother</option>
                                 <option value="father">Father</option>
@@ -80,34 +75,96 @@
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <!-- Age -->
                         <div class="form-group">
                             <label for="age">Age</label>
-                            <input type="number" id="age" name="age" class="form-control" placeholder="Enter age">
+                            <input type="number" id="age" name="age" class="form-control" placeholder="Enter age" required>
                         </div>
-                        <!-- Brief Medical Summary -->
                         <div class="form-group">
                             <label for="medical_summary">Brief Medical Summary</label>
-                            <textarea id="medical_summary" name="medical_summary" class="form-control" rows="3" placeholder="Enter brief medical summary"></textarea>
+                            <textarea id="medical_summary" name="medical_summary" class="form-control" rows="3" placeholder="Enter brief medical summary" required></textarea>
                         </div>
-                        <!-- Services Required -->
                         <div class="form-group">
                             <label for="services_required">Services Required</label>
-                            <textarea id="services_required" name="services_required" class="form-control" rows="3" placeholder="Enter required services"></textarea>
+                            <textarea id="services_required" name="services_required" class="form-control" rows="3" placeholder="Enter required services" required></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Submit Button -->
-        <div class="text-right">
-            <button type="submit" class="btn btn-primary">Save Lead</button>
+        
+        <form method="POST" action="{% url 'add_lead' %}">
+            {% csrf_token %}
+            <input type="hidden" id="lead_status" name="status" value="ready_for_consultation"> <!-- Default -->
+            
+            <div class="text-right">
+                <!-- Ready for Consultation Button -->
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="btnReadyForConsultation"
+                    data-status="ready_for_consultation"
+                >
+                    Ready for Consultation
+                </button>
+        
+                <!-- Not Ready for Consultation Button -->
+                <button
+                    type="submit"
+                    class="btn btn-secondary"
+                    id="btnNotReadyForConsultation"
+                    data-status="not_ready_for_consultation"
+                >
+                    Not Ready for Consultation
+                </button>
+            </div>
+        </form>
+        
+        
+        
+        
+        <!-- Still Prospecting Modal -->
+        <div class="modal fade" id="stillProspectingModal" tabindex="-1" role="dialog" aria-labelledby="stillProspectingModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="stillProspectingModalLabel">Still Prospecting</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="stillProspectingForm">
+                            <div class="form-group">
+                                <label for="reason">Reason for Still Prospecting</label>
+                                <textarea id="reason" name="reason" class="form-control" rows="3" placeholder="Enter reason"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Follow-Up In:</label>
+                                <div class="btn-group btn-group-toggle d-block mb-3" data-toggle="buttons">
+                                    <label class="btn btn-outline-primary">
+                                        <input type="radio" name="follow_up" value="1" autocomplete="off"> 1 Day
+                                    </label>
+                                    <label class="btn btn-outline-primary">
+                                        <input type="radio" name="follow_up" value="2" autocomplete="off"> 2 Days
+                                    </label>
+                                    <label class="btn btn-outline-primary">
+                                        <input type="radio" name="follow_up" value="3" autocomplete="off"> 3 Days
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveStillProspecting">Save</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
+        
 {% endblock content %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'assets/js/prospecting_modal_handling.js' %}"></script>
+<script src="{% static 'assets/js/add_lead_main.js' %}"></script>
 {% endblock extra_js %}

@@ -15,6 +15,8 @@ class Lead(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
+    reason = models.TextField(null=True, blank=True)  # Optional field for reason
+    follow_up = models.CharField(max_length=20, null=True, blank=True)  # Optional field for follow-up
     location = models.CharField(max_length=255, default="Unknown")
     stage = models.CharField(
         max_length=50,

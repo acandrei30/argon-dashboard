@@ -1,0 +1,31 @@
+{% load static %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Modal for Scheduling Consultation -->
+<div class="modal fade" id="calendar-modal" tabindex="-1" role="dialog" aria-labelledby="calendar-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendar-modal-label">Select Consultation Date and Time</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Datepicker for Date and Time -->
+                <div>
+                    <label for="selected-date">Select Date</label>
+                    <input type="text" id="selected-date" class="form-control">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="selected-time">Select Time</label>
+                    <input type="text" id="selected-time" class="form-control">
+                </div>
+                <p id="selected-date-text" class="mt-2">You have selected: None</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-consultation" disabled>Save Consultation</button>
+            </div>
+        </div>
+    </div>
+</div>
