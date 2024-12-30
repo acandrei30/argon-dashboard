@@ -1,56 +1,90 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("leadForm");
-    const btnNotReadyForConsultation = document.getElementById("btnNotReadyForConsultation");
-    const stillProspectingModal = new bootstrap.Modal(document.getElementById("stillProspectingModal"));
-    const saveStillProspectingButton = document.getElementById("saveStillProspecting");
+    const readyButton = document.getElementById("btnReadyForConsultation");
+    const notReadyButton = document.getElementById("btnNotReadyForConsultation");
+    const notReadyModal = new bootstrap.Modal(document.getElementById("notReadyForConsultationModal"));
+    const saveNotReadyButton = document.getElementById("saveNotReadyForConsultation");
+    const hiddenStatusField = document.getElementById("lead_status");
 
-    // Handle "Not Ready for Consultation" button click
-    btnNotReadyForConsultation.addEventListener("click", function (event) {
-        event.preventDefault();
+    // Initialize Flatpickr for manual date selection
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr("#manualFollowUpDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today", // Prevent selecting past dates
+        });
+    } else {
+        console.warn('Flatpickr is not defined. Ensure the library is loaded.');
+    }
 
-        // Validate the form first
-        if (!form.checkValidity()) {
-            form.reportValidity(); // Show browser validation messages
+    // Function to check if required fields are filled
+    function areFormFieldsComplete(form) {
+        const requiredFields = form.querySelectorAll('[required]');
+        for (const field of requiredFields) {
+            if (!field.value.trim()) {
+                field.focus(); // Focus on the first incomplete field
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Handle "Ready for Consultation" button click
+    readyButton.addEventListener("click", function () {
+        hiddenStatusField.value = "ready_for_consultation"; // Set status
+        if (!areFormFieldsComplete(form)) {
+            alert("Please fill out all required fields.");
             return;
         }
-
-        // Show the modal if validation is successful
-        stillProspectingModal.show();
+        form.submit(); // Submit the form directly
     });
 
-    // Handle modal "Save" button click
-    saveStillProspectingButton.addEventListener("click", function (event) {
+    // Handle "Not Ready for Consultation" button click
+    notReadyButton.addEventListener("click", function () {
+        hiddenStatusField.value = "not_ready_for_consultation"; // Set status
+        if (!areFormFieldsComplete(form)) {
+            alert("Please fill out all required fields.");
+            return;
+        }
+        notReadyModal.show(); // Open the modal
+    });
+
+    // Handle "Save" button in modal
+    saveNotReadyButton.addEventListener("click", function () {
         const reason = document.getElementById("reason").value.trim();
-        const followUpSelected = document.querySelector('input[name="follow_up"]:checked');
+        const followUpDays = document.querySelector('input[name="follow_up"]:checked')?.value;
+        const manualFollowUpDate = document.getElementById("manualFollowUpDate")?.value;
 
+        // Validate modal fields
         if (!reason) {
-            alert("Please provide a reason for still prospecting.");
+            alert("Please provide a reason for not being ready.");
             return;
         }
 
-        if (!followUpSelected) {
-            alert("Please select a follow-up option.");
+        if (!followUpDays && !manualFollowUpDate) {
+            alert("Please select either a number of days or a manual follow-up date.");
             return;
         }
 
-        // Add the modal data to the form and submit
-        const hiddenReasonInput = document.createElement("input");
-        hiddenReasonInput.type = "hidden";
-        hiddenReasonInput.name = "reason";
-        hiddenReasonInput.value = reason;
-        form.appendChild(hiddenReasonInput);
+        // Determine follow-up date
+        let followUpDate = manualFollowUpDate;
+        if (!followUpDate && followUpDays) {
+            const today = new Date();
+            today.setDate(today.getDate() + parseInt(followUpDays));
+            followUpDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+        }
 
-        const hiddenFollowUpInput = document.createElement("input");
-        hiddenFollowUpInput.type = "hidden";
-        hiddenFollowUpInput.name = "follow_up";
-        hiddenFollowUpInput.value = followUpSelected.value;
-        form.appendChild(hiddenFollowUpInput);
+        // Add follow-up data to the form
+        const followUpInput = document.createElement("input");
+        followUpInput.type = "hidden";
+        followUpInput.name = "follow_up_date";
+        followUpInput.value = followUpDate;
+        form.appendChild(followUpInput);
 
-        const hiddenStatusInput = document.createElement("input");
-        hiddenStatusInput.type = "hidden";
-        hiddenStatusInput.name = "status";
-        hiddenStatusInput.value = btnNotReadyForConsultation.getAttribute("data-status");
-        form.appendChild(hiddenStatusInput);
+        const reasonInput = document.createElement("input");
+        reasonInput.type = "hidden";
+        reasonInput.name = "reason";
+        reasonInput.value = reason;
+        form.appendChild(reasonInput);
 
         // Submit the form
         form.submit();

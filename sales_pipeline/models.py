@@ -15,9 +15,11 @@ class Lead(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
-    reason = models.TextField(null=True, blank=True)  # Optional field for reason
-    follow_up = models.CharField(max_length=20, null=True, blank=True)  # Optional field for follow-up
+    reason = models.TextField(null=True, blank=True)
+    follow_up = models.CharField(max_length=20, null=True, blank=True)
     location = models.CharField(max_length=255, default="Unknown")
+    follow_up_date = models.DateField(null=True, blank=True)  # Add this field if missing
+    status = models.CharField(max_length=50, null=True, blank=True)  # Add this field if missing
     stage = models.CharField(
         max_length=50,
         choices=SalesPipelineStage.choices,
