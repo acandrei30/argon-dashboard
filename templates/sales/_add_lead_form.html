@@ -1,0 +1,69 @@
+<!-- Form Section -->
+<form method="POST" action="{% url 'add_lead' %}" id="leadForm">
+    {% csrf_token %}
+    {% include 'sales/_add_lead_cards.html' %}
+    
+    <input type="hidden" id="lead_status" name="status" value="ready_for_consultation"> <!-- Default -->
+    
+    <div class="text-right">
+        <!-- Ready for Consultation Button -->
+        <button
+            type="submit"
+            class="btn btn-primary"
+            id="btnReadyForConsultation"
+            data-status="ready_for_consultation"
+        >
+            Ready for Consultation
+        </button>
+
+        <!-- Not Ready for Consultation Button -->
+        <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnNotReadyForConsultation"
+            data-status="not_ready_for_consultation"
+        >
+            Not Ready for Consultation
+        </button>
+    </div>
+</form>
+
+<!-- Not Ready for Consultation Modal -->
+<div class="modal fade" id="notReadyForConsultationModal" tabindex="-1" role="dialog" aria-labelledby="notReadyForConsultationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notReadyForConsultationModalLabel">Not Ready for Consultation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="notReadyForConsultationForm">
+                    <div class="form-group">
+                        <label for="reason">Reason for Not Ready</label>
+                        <textarea id="reason" name="reason" class="form-control" rows="3" placeholder="Enter reason"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Follow-Up In:</label>
+                        <div class="btn-group btn-group-toggle d-block mb-3" data-toggle="buttons">
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="follow_up" value="1" autocomplete="off"> 1 Day
+                            </label>
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="follow_up" value="2" autocomplete="off"> 2 Days
+                            </label>
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="follow_up" value="3" autocomplete="off"> 3 Days
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveNotReadyForConsultation">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
