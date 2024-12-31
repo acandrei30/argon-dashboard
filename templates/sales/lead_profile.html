@@ -59,26 +59,8 @@
 
     <!-- Modal for Scheduling Consultation -->
     {% include 'sales/consultation_modal.html' %}
+    {% include 'sales/_lead_consultation.html' %}
 
-    {% if lead.consultation %}
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5>Consultation Details</h5>
-            <p><strong>Alertness:</strong> {{ lead.consultation.alertness }}</p>
-            <p><strong>Lives Alone:</strong> {{ lead.consultation.lives_alone }}</p>
-            <p><strong>House Suitable:</strong> {{ lead.consultation.house_suitable }}</p>
-            <p><strong>Speech Impairment:</strong> {{ lead.consultation.speech_impairment }}</p>
-            <p><strong>Sight Impairment:</strong> {{ lead.consultation.sight_impairment }}</p>
-            <p><strong>Hearing Impairment:</strong> {{ lead.consultation.hearing_impairment }}</p>
-            <p><strong>Locomotive Impairment:</strong> {{ lead.consultation.locomotive_impairment }}</p>
-            <p><strong>Lifting Required:</strong> {{ lead.consultation.lifting_required }}</p>
-            <p><strong>Personal Help Required:</strong> {{ lead.consultation.personal_help }}</p>
-            <p><strong>Allergies:</strong> {{ lead.consultation.allergies }}</p>
-            <p><strong>Recent Hospitalization:</strong> {{ lead.consultation.recent_hospitalization }}</p>
-            <p><strong>Hospitalization Reason:</strong> {{ lead.consultation.hospitalization_reason }}</p>
-        </div>
-    </div>
-    {% endif %}
 
 </div>
 {% endblock content %}
@@ -89,7 +71,8 @@
   <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
   <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
   <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script> 
-
+  <script src="{% static 'assets/js/follow_up.js' %}"></script>
+  <script src="{% static 'assets/js/consultation.js' %}"></script>
 
 <script>
 

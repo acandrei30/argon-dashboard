@@ -1,65 +1,52 @@
 $(document).ready(function () {
-  // Initialize variables
-  const followUpCheckbox = $("#followUpTask");
-  const followUpModal = new bootstrap.Modal(document.getElementById("followUpModal"));
-  const saveFollowUpButton = $("#saveFollowUp");
+    const followUpCheckbox = $("#followUpTask");
+    const followUpActionModal = new bootstrap.Modal(document.getElementById('followUpActionModal'));
+    const saveFollowUpAction = $("#saveFollowUpAction");
 
-  // Open modal when checkbox is clicked
-  followUpCheckbox.change(function () {
-      if (this.checked) {
-          followUpModal.show();
-      }
-  });
+    // Handle Follow-Up Task Checkbox
+    followUpCheckbox.change(function () {
+        if (this.checked) {
+            followUpActionModal.show();
+        }
+    });
 
-  // Save follow-up note
-  saveFollowUpButton.click(function () {
-      const note = $("#followUpNote").val().trim(); // Get the note input value
-      const url = followUpCheckbox.data("url"); // URL for the AJAX request
-      const csrfToken = followUpCheckbox.data("csrf"); // CSRF token
+    // Save Follow-Up Action
+    saveFollowUpAction.click(function () {
+        const note = $("#followUpNote").val().trim();
 
-      // Validate the note
-      if (!note) {
-          Swal.fire({
-              title: "Error",
-              text: "Please enter a note before saving.",
-              icon: "error",
-              confirmButtonText: "Ok",
-          });
-          return;
-      }
+        if (!note) {
+            alert("Please provide a follow-up note.");
+            return;
+        }
 
-      // Perform AJAX request to save the note
-      $.ajax({
-          url: url,
-          method: "POST",
-          data: {
-              action: "add_note",
-              note: note,
-              csrfmiddlewaretoken: csrfToken,
-          },
-          success: function (response) {
-              Swal.fire({
-                  title: "Success!",
-                  text: "The follow-up note has been added.",
-                  icon: "success",
-                  confirmButtonText: "Ok",
-              }).then(() => {
-                  location.reload(); // Reload the page to reflect the updates
-              });
-          },
-          error: function (xhr, status, error) {
-              let errorMessage = "There was an error updating the follow-up task.";
-              if (xhr.responseJSON && xhr.responseJSON.error) {
-                  errorMessage = xhr.responseJSON.error;
-              }
+        // Send data to the backend
+        fetch("{% url 'update-lead-follow-up' lead.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ note: note }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Follow-up action saved successfully!");
 
-              Swal.fire({
-                  title: "Error",
-                  text: errorMessage,
-                  icon: "error",
-                  confirmButtonText: "Ok",
-              });
-          },
-      });
-  });
+                    // Disable the checkbox and hide the modal
+                    followUpCheckbox.prop("checked", true).prop("disabled", true);
+                    followUpActionModal.hide();
+                } else {
+                    alert("An error occurred while saving the follow-up action.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("A network error occurred. Please try again.");
+            });
+    });
+
+    // Disable the follow-up checkbox if already marked as done
+    if (followUpCheckbox.data("done") === "true") {
+        followUpCheckbox.prop("checked", true).prop("disabled", true);
+    }
 });
