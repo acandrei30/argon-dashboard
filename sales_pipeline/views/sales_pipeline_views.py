@@ -16,9 +16,14 @@ def sales_pipeline(request):
             SalesPipelineStage.READY_FOR_SERVICE: "Ready for Service",
         }
 
-        # Fetch leads grouped by stage
+        # Fetch leads grouped by stage, including follow_up_date
         leads_by_stage = {
-            stage: list(Lead.objects.filter(stage=stage).values("id", "name", "consultation_datetime"))
+            stage: list(Lead.objects.filter(stage=stage).values(
+                "id", 
+                "name", 
+                "consultation_datetime", 
+                "follow_up_date"  # Include follow-up date
+            ))
             for stage in stages.keys()
         }
 

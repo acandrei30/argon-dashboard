@@ -20,41 +20,50 @@
  <!-- Pipeline Cards in Flex Row -->
 <div class="d-flex flex-wrap justify-content-between">
   {% for stage, leads in leads_by_stage.items %}
-    <div class="card flex-grow-1 mx-2" style="min-width: 250px; max-width: 300px;">
+  {% for stage, leads in leads_by_stage.items %}
+  <div class="card flex-grow-1 mx-2" style="min-width: 250px; max-width: 300px;">
       <div class="card-header">
-        <h5>{{ stages|dict_get:stage }}</h5>
+          <h5>{{ stages|dict_get:stage }}</h5>
       </div>
       <div class="card-body"
            id="stage-{{ stage }}"
            ondragover="allowDrop(event)"
            ondrop="handleDrop(event, '{{ stage }}')">
-        {% for lead in leads %}
-          <div class="mb-3 lead-card"
-               id="lead-{{ lead.id }}"
-               draggable="true"
-               ondragstart="handleDragStart(event, '{{ lead.id }}')">
-            <!-- Link to Lead's Profile -->
-            <a href="{% url 'lead_profile' lead.id %}">{{ lead.name }}</a>
-            
-            <!-- Show Follow-Up Date if Stage is 'Prospecting' -->
-            {% if stage == SalesPipelineStage.PROSPECTING and lead.follow_up_date %}
-              <span class="badge badge-warning mt-1">
-                Follow-Up: {{ lead.follow_up_date|date:"Y-m-d" }}
-              </span>
-            {% endif %}
-            
-            <!-- Show Consultation Date and Time if Stage is 'Consultation Scheduled' -->
-            {% if stage == SalesPipelineStage.CONSULTATION_SCHEDULED and lead.consultation_datetime %}
-              <span class="badge badge-info mt-1">
-                {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
-              </span>
-            {% endif %}
-          </div>
-        {% empty %}
-          <p>No leads in this stage.</p>
-        {% endfor %}
+          {% for lead in leads %}
+              <div class="mb-3 lead-card"
+                   id="lead-{{ lead.id }}"
+                   draggable="true"
+                   ondragstart="handleDragStart(event, '{{ lead.id }}')">
+                  <!-- Lead Name -->
+                  <a href="{% url 'lead_profile' lead.id %}">{{ lead.name }}</a>
+
+                  <!-- Follow-Up or New Badge -->
+                  {% if stage == SalesPipelineStage.PROSPECTING %}
+                      {% if lead.follow_up_date %}
+                          <span class="badge badge-warning mt-1">
+                              Follow-Up: {{ lead.follow_up_date|date:"Y-m-d" }}
+                          </span>
+                      {% else %}
+                          <span class="badge badge-secondary mt-1">
+                              New
+                          </span>
+                      {% endif %}
+                  {% endif %}
+
+                  <!-- Consultation Date Badge -->
+                  {% if stage == SalesPipelineStage.CONSULTATION_SCHEDULED and lead.consultation_datetime %}
+                      <span class="badge badge-info mt-1">
+                          {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
+                      </span>
+                  {% endif %}
+              </div>
+          {% empty %}
+              <p>No leads in this stage.</p>
+          {% endfor %}
       </div>
-    </div>
+  </div>
+{% endfor %}
+
   {% endfor %}
 </div>
 

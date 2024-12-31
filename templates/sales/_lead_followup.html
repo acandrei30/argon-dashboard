@@ -7,7 +7,12 @@
         class="form-check-input" 
         data-done="{{ lead.follow_up_done|yesno:'true,false' }}" 
         {% if lead.follow_up_done %} checked disabled {% endif %}>
-    <span class="ml-2">Mark follow-up as done</span>
+    <span class="ml-2">
+        Mark follow-up as done
+        {% if lead.follow_up_date %}
+            <small class="text-muted">(Next due: {{ lead.follow_up_date|date:"Y-m-d" }})</small>
+        {% endif %}
+    </span>
 </div>
 
 <!-- Follow-Up Modal -->

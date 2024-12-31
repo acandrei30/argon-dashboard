@@ -1,52 +1,56 @@
 $(document).ready(function () {
     const followUpCheckbox = $("#followUpTask");
-    const followUpActionModal = new bootstrap.Modal(document.getElementById('followUpActionModal'));
+    const followUpActionModal = new bootstrap.Modal(document.getElementById("followUpActionModal"));
     const saveFollowUpAction = $("#saveFollowUpAction");
 
-    // Handle Follow-Up Task Checkbox
     followUpCheckbox.change(function () {
         if (this.checked) {
             followUpActionModal.show();
         }
     });
 
-    // Save Follow-Up Action
     saveFollowUpAction.click(function () {
         const note = $("#followUpNote").val().trim();
+        const followUpDate = $("#followUpDate").val().trim();
 
-        if (!note) {
-            alert("Please provide a follow-up note.");
+        if (!note || !followUpDate) {
+            alert("Please provide both a follow-up date and note.");
             return;
         }
 
-        // Send data to the backend
-        fetch("{% url 'update-lead-follow-up' lead.id %}", {
+        fetch(updateFollowUpUrl, { // Use the global variable
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}",
+                "X-CSRFToken": csrfToken, // Use the global variable
             },
-            body: JSON.stringify({ note: note }),
+            body: JSON.stringify({ note: note, follow_up_date: followUpDate }),
         })
             .then((response) => {
                 if (response.ok) {
-                    alert("Follow-up action saved successfully!");
-
-                    // Disable the checkbox and hide the modal
-                    followUpCheckbox.prop("checked", true).prop("disabled", true);
-                    followUpActionModal.hide();
+                    Swal.fire({
+                        title: "Follow-Up Saved!",
+                        text: "Your follow-up has been saved.",
+                        icon: "success",
+                        confirmButtonText: "Ok",
+                    }).then(() => location.reload());
                 } else {
-                    alert("An error occurred while saving the follow-up action.");
+                    Swal.fire({
+                        title: "Error",
+                        text: "Failed to save follow-up.",
+                        icon: "error",
+                        confirmButtonText: "Ok",
+                    });
                 }
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("A network error occurred. Please try again.");
+                Swal.fire({
+                    title: "Network Error",
+                    text: "Failed to connect to the server.",
+                    icon: "error",
+                    confirmButtonText: "Ok",
+                });
             });
     });
-
-    // Disable the follow-up checkbox if already marked as done
-    if (followUpCheckbox.data("done") === "true") {
-        followUpCheckbox.prop("checked", true).prop("disabled", true);
-    }
 });

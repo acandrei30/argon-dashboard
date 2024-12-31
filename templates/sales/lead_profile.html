@@ -4,7 +4,6 @@
 {% block extrastyle %}
   <!-- Page plugins -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  
 {% endblock extrastyle %}
 
 {% block title %} Lead Profile {% endblock title %}
@@ -25,309 +24,55 @@
 
     <div class="card-body">
 
-      {% if lead.stage == "Consultation Scheduled" %}
-      <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
-  {% endif %}
+        {% if lead.stage == "Consultation Scheduled" %}
+        <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
+        {% endif %}
 
-    {% include 'sales/_lead_followup.html' %}
+        {% include 'sales/_lead_followup.html' %}
 
-
-    <!-- Lead Form Section -->
-    <div class="row">
-        <div class="col-xl-8">
-            {% include 'sales/_lead_form.html' %}
-        </div>
-        <div class="col-xl-4">
-            <!-- Right Sidebar Section -->
-            <div class="card">
-                <div class="card-body">
-                    <h5>Consultation Date & Time</h5>
-                    <p id="consultation-datetime">
-                        {% if lead.consultation_datetime %}
-                          {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
-                          <button id="edit-consultation" class="btn btn-sm btn-secondary">Edit</button>
-                        {% else %}
-                          Not Scheduled
-                        {% endif %}
-                    </p>
-                </div>
+        <!-- Lead Form Section -->
+        <div class="row">
+            <div class="col-xl-8">
+                {% include 'sales/_lead_form.html' %}
             </div>
-            {% include 'sales/_lead_actions.html' %}
-            {% include 'sales/_lead_notes.html' %}
+            <div class="col-xl-4">
+                <!-- Right Sidebar Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Consultation Date & Time</h5>
+                        <p id="consultation-datetime">
+                            {% if lead.consultation_datetime %}
+                                {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
+                                <button id="edit-consultation" class="btn btn-sm btn-secondary">Edit</button>
+                            {% else %}
+                                Not Scheduled
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% include 'sales/_lead_actions.html' %}
+                {% include 'sales/_lead_notes.html' %}
+            </div>
         </div>
+
+        <!-- Modal for Scheduling Consultation -->
+        {% include 'sales/consultation_modal.html' %}
+        {% include 'sales/_lead_consultation.html' %}
+
     </div>
-
-    <!-- Modal for Scheduling Consultation -->
-    {% include 'sales/consultation_modal.html' %}
-    {% include 'sales/_lead_consultation.html' %}
-
-
 </div>
 {% endblock content %}
 
 {% block extra_js %}
-  <!-- FullCalendar JS -->
+  <script>
+    const csrfToken = "{{ csrf_token }}";
+    const updateConsultationUrl = "{% url 'update-lead-consultation' lead.id %}";
+    const updateFollowUpUrl = "{% url 'update-lead-follow-up' lead.id %}";
+  </script>
+  <script src="{% static 'assets/js/follow_up.js' %}"></script>
+  <script src="{% static 'assets/js/consultation.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
   <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script> 
-  <script src="{% static 'assets/js/follow_up.js' %}"></script>
-  <script src="{% static 'assets/js/consultation.js' %}"></script>
-
-<script>
-
-$(document).ready(function () {
-    const followUpCheckbox = $("#followUpTask");
-    const followUpActionModal = new bootstrap.Modal(document.getElementById('followUpActionModal'));
-    const actionDropdown = $("#action");
-    const noteSection = $("#noteSection");
-    const followUpSection = $("#followUpSection");
-    const saveFollowUpAction = $("#saveFollowUpAction");
-
-    // Show or hide sections based on action
-    actionDropdown.change(function () {
-        const action = $(this).val();
-        if (action === "next_stage") {
-            noteSection.hide();
-            followUpSection.hide();
-        } else if (action === "add_note") {
-            noteSection.show();
-            followUpSection.show();
-        }
-    });
-
-    // Handle Follow-Up Task Checkbox
-    followUpCheckbox.change(function () {
-        if (this.checked) {
-            followUpActionModal.show();
-        }
-    });
-
-    // Save Follow-Up Action
-    saveFollowUpAction.click(function () {
-        const action = actionDropdown.val();
-        const note = $("#followUpNote").val();
-        const followUpDays = $("#followUpDays").val();
-
-        let data = { csrfmiddlewaretoken: "{{ csrf_token }}" };
-
-        if (action === "next_stage") {
-            data["action"] = "next_stage";
-        } else if (action === "add_note") {
-            if (!note || !followUpDays) {
-                alert("Please fill out all fields for the note and follow-up.");
-                return;
-            }
-            data["action"] = "add_note";
-            data["note"] = note;
-            data["follow_up_days"] = followUpDays;
-        }
-
-        $.ajax({
-            url: '{% url "update-lead-follow-up" lead.id %}',
-            method: "POST",
-            data: data,
-            success: function (response) {
-                Swal.fire({
-                    title: "Success!",
-                    text: "The follow-up action has been saved.",
-                    icon: "success",
-                    confirmButtonText: "Ok",
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function (xhr, status, error) {
-                Swal.fire({
-                    title: "Error",
-                    text: "There was an error saving the follow-up action.",
-                    icon: "error",
-                    confirmButtonText: "Ok",
-                });
-            },
-        });
-    });
-});
-
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const followUpCheckbox = document.getElementById("followUpTask");
-    const followUpModalElement = document.getElementById("followUpActionModal");
-    const followUpNoteInput = document.getElementById("followUpNote");
-    const saveFollowUpButton = document.getElementById("saveFollowUpAction");
-
-    // Initialize the modal (Bootstrap 5)
-    let followUpModal = null;
-    if (followUpModalElement) {
-        followUpModal = new bootstrap.Modal(followUpModalElement);
-    }
-
-    // Open the modal when the checkbox is checked
-    followUpCheckbox.addEventListener("change", function () {
-        if (this.checked && followUpModal) {
-            followUpModal.show();
-        }
-    });
-
-    // Save the follow-up action
-    saveFollowUpButton.addEventListener("click", function () {
-        const note = followUpNoteInput.value.trim();
-
-        if (!note) {
-            alert("Please provide a follow-up note.");
-            return;
-        }
-
-        // Send data to the backend
-        fetch("{% url 'update-lead-follow-up' lead.id %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}",
-            },
-            body: JSON.stringify({ note: note }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    alert("Follow-up action saved successfully!");
-
-                    // Disable the checkbox and hide the modal
-                    followUpCheckbox.checked = true;
-                    followUpCheckbox.disabled = true;
-
-                    if (followUpModal) {
-                        followUpModal.hide();
-                    }
-                } else {
-                    alert("An error occurred while saving the follow-up action.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("A network error occurred. Please try again.");
-            });
-    });
-
-    // Disable the follow-up checkbox if already marked as done
-    if (followUpCheckbox.dataset.done === "true") {
-        followUpCheckbox.checked = true;
-        followUpCheckbox.disabled = true;
-    }
-});
-
-
-</script>
-
-
-  <script>
-    $(document).ready(function () {
-      // Initialize Flatpickr for date selection
-      flatpickr("#selected-date", {
-        dateFormat: "Y-m-d", // Format for date (YYYY-MM-DD)
-        onChange: function (selectedDates, dateStr, instance) {
-          $("#selected-time").prop("disabled", false);
-          $("#selected-date-text").text("You have selected: " + dateStr);
-          updateSaveButtonState();
-        },
-      });
-
-      // Initialize Flatpickr for time selection
-      flatpickr("#selected-time", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: true,
-        onChange: function (selectedDates, dateStr, instance) {
-          updateSaveButtonState();
-        },
-      });
-
-      function updateSaveButtonState() {
-        var dateSelected = $("#selected-date").val();
-        var timeSelected = $("#selected-time").val();
-        $("#save-consultation").prop("disabled", !dateSelected || !timeSelected);
-      }
-
-      // Save Consultation
-      $("#save-consultation").click(function () {
-        var consultationDate = $("#selected-date").val();
-        var consultationTime = $("#selected-time").val();
-        var consultationDatetime = consultationDate + " " + consultationTime;
-
-        $.ajax({
-          url: '{% url "update-lead-consultation" lead.id %}',
-          method: "POST",
-          data: {
-            consultation_datetime: consultationDatetime,
-            csrfmiddlewaretoken: "{{ csrf_token }}",
-          },
-          success: function (response) {
-            Swal.fire({
-              title: "Consultation Scheduled!",
-              text: "The consultation has been scheduled.",
-              icon: "success",
-              confirmButtonText: "Ok",
-            }).then(() => {
-              location.reload(); // Automatically refresh the page
-            });
-          },
-          error: function (xhr, status, error) {
-            Swal.fire({
-              title: "Error",
-              text: "There was an error scheduling the consultation.",
-              icon: "error",
-              confirmButtonText: "Ok",
-            });
-          },
-        });
-      });
-
-      // Edit Consultation Date & Time
-      $(document).on("click", "#edit-consultation", function () {
-        var currentDatetime = $("#consultation-datetime").text().trim();
-        var editHtml = `
-          <input id="edit-date" class="form-control mb-2" type="date" value="${currentDatetime.split(' ')[0]}">
-          <input id="edit-time" class="form-control mb-2" type="time" value="${currentDatetime.split(' ')[1]}">
-          <button id="save-edited-consultation" class="btn btn-sm btn-success">Save</button>
-        `;
-        $("#consultation-datetime").html(editHtml);
-      });
-
-      // Save Edited Consultation Date & Time
-      $(document).on("click", "#save-edited-consultation", function () {
-        var newDate = $("#edit-date").val();
-        var newTime = $("#edit-time").val();
-        var newDatetime = `${newDate} ${newTime}`;
-
-        $.ajax({
-          url: '{% url "update-lead-consultation" lead.id %}',
-          method: "POST",
-          data: {
-            consultation_datetime: newDatetime,
-            csrfmiddlewaretoken: "{{ csrf_token }}",
-          },
-          success: function (response) {
-            Swal.fire({
-              title: "Updated!",
-              text: "The consultation date and time have been updated.",
-              icon: "success",
-              confirmButtonText: "Ok",
-            }).then(() => {
-              location.reload(); // Automatically refresh the page
-            });
-          },
-          error: function (xhr, status, error) {
-            Swal.fire({
-              title: "Error",
-              text: "There was an error updating the consultation date and time.",
-              icon: "error",
-              confirmButtonText: "Ok",
-            });
-          },
-        });
-      });
-    });
-  </script>
+  <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script>
 {% endblock extra_js %}
