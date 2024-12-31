@@ -64,3 +64,18 @@ class LeadNotes(models.Model):
 
     def __str__(self):
         return f"Notes for {self.lead.name} (Created on {self.created_at})"
+
+class Consultation(models.Model):
+    lead = models.OneToOneField(Lead, on_delete=models.CASCADE, related_name="consultation")
+    alertness = models.CharField(max_length=50)
+    lives_alone = models.CharField(max_length=10)
+    house_suitable = models.CharField(max_length=10)
+    speech_impairment = models.CharField(max_length=20)
+    sight_impairment = models.CharField(max_length=20)
+    hearing_impairment = models.CharField(max_length=20)
+    locomotive_impairment = models.CharField(max_length=20)
+    lifting_required = models.CharField(max_length=10)
+    personal_help = models.CharField(max_length=10)
+    allergies = models.TextField(blank=True, null=True)
+    recent_hospitalization = models.CharField(max_length=10)
+    hospitalization_reason = models.TextField(blank=True, null=True)

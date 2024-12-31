@@ -4,6 +4,9 @@
         <h4>Actions</h4>
     </div>
     <div class="card-body">
+        {% if lead.stage == "consultation" %}
+    <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
+{% endif %}
         {% if next_action_label and next_stage %}
         <!-- Check if the next stage is "Consultation Scheduled" -->
         {% if next_stage == 'Consultation Scheduled' %}

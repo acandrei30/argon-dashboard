@@ -1,0 +1,110 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Consultation Form {% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="text-primary">Consultation Form</h1>
+
+    <form method="POST" action="{% url 'save-consultation-form' lead.id %}">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="alertness" class="form-label">Is patient alert?</label>
+            <select id="alertness" name="alertness" class="form-control">
+                <option value="always">Always</option>
+                <option value="sometimes">Sometimes</option>
+                <option value="never">Never</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="lives_alone" class="form-label">Patient lives alone?</label>
+            <select id="lives_alone" name="lives_alone" class="form-control">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="house_suitable" class="form-label">Is house suitable for caregiver?</label>
+            <select id="house_suitable" name="house_suitable" class="form-control">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="speech_impairment" class="form-label">Speech impairment</label>
+            <select id="speech_impairment" name="speech_impairment" class="form-control">
+                <option value="none">None</option>
+                <option value="partial">Partial</option>
+                <option value="total">Total</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="sight_impairment" class="form-label">Sight impairment</label>
+            <select id="sight_impairment" name="sight_impairment" class="form-control">
+                <option value="none">None</option>
+                <option value="partial">Partial</option>
+                <option value="total">Total</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="hearing_impairment" class="form-label">Hearing impairment</label>
+            <select id="hearing_impairment" name="hearing_impairment" class="form-control">
+                <option value="none">None</option>
+                <option value="partial">Partial</option>
+                <option value="total">Total</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="locomotive_impairment" class="form-label">Locomotive impairment</label>
+            <select id="locomotive_impairment" name="locomotive_impairment" class="form-control">
+                <option value="none">None</option>
+                <option value="partial">Partial</option>
+                <option value="total">Total</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="lifting_required" class="form-label">Lifting required?</label>
+            <select id="lifting_required" name="lifting_required" class="form-control">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="personal_help" class="form-label">Dressing, washing, toilet help required?</label>
+            <select id="personal_help" name="personal_help" class="form-control">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="allergies" class="form-label">Allergies</label>
+            <input type="text" id="allergies" name="allergies" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="recent_hospitalization" class="form-label">Recent hospitalization?</label>
+            <select id="recent_hospitalization" name="recent_hospitalization" class="form-control">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="hospitalization_reason" class="form-label">Reason for hospitalization (if any)</label>
+            <input type="text" id="hospitalization_reason" name="hospitalization_reason" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock content %}

@@ -8,12 +8,16 @@ from .views import (
     add_notes,
     update_lead_consultation,
     archive_lead,
+    start_consultation_form, 
+    save_consultation_form
 )
 
 urlpatterns = [
     # Pipeline-related paths
     path("pipeline/", sales_pipeline, name="sales-pipeline"),
     path("add_lead/", add_lead, name="add_lead"),
+    path('start-consultation-form/<int:lead_id>/', start_consultation_form, name='start-consultation-form'),
+    path('save-consultation-form/<int:lead_id>/', save_consultation_form, name='save-consultation-form'),
 
     # Lead-specific paths
     path("lead_profile/<int:lead_id>/", lead_profile, name="lead_profile"),
@@ -24,6 +28,7 @@ urlpatterns = [
 
     # Follow-up and notes paths
     path("update_follow_up/<int:lead_id>/", update_lead_follow_up, name="update-lead-follow-up"),
+    
     path("add_notes/<int:lead_id>/", add_notes, name="add-notes"),
 
     # Consultation-related paths

@@ -31,3 +31,35 @@ def update_lead_consultation(request, lead_id):
             return JsonResponse({"error": f"An unexpected error occurred: {str(e)}"}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+from django.shortcuts import render, get_object_or_404, redirect
+from sales_pipeline.models import Lead, Consultation
+
+def start_consultation_form(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    return render(request, "sales/consultation_form.html", {"lead": lead})
+
+def save_consultation_form(request, lead_id):
+    if request.method == "POST":
+        lead = get_object_or_404(Lead, id=lead_id)
+
+        # Create or update the consultation data
+        consultation, created = Consultation.objects.get_or_create(lead=lead)
+        consultation.alertness = request.POST.get("alertness")
+        consultation.lives_alone = request.POST.get("lives_alone")
+        consultation.house_suitable = request.POST.get("house_suitable")
+        consultation.speech_impairment = request.POST.get("speech_impairment")
+        consultation.sight_impairment = request.POST.get("sight_impairment")
+        consultation.hearing_impairment = request.POST.get("hearing_impairment")
+        consultation.locomotive_impairment = request.POST.get("locomotive_impairment")
+        consultation.lifting_required = request.POST.get("lifting_required")
+        consultation.personal_help = request.POST.get("personal_help")
+        consultation.allergies = request.POST.get("allergies")
+        consultation.recent_hospitalization = request.POST.get("recent_hospitalization")
+        consultation.hospitalization_reason = request.POST.get("hospitalization_reason")
+        consultation.save()
+
+        return redirect("lead_profile", lead_id=lead.id)
+
+    return redirect("lead_profile", lead_id=lead_id)
+

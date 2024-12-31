@@ -4,6 +4,8 @@ from .stage_views import update_stage, move_backward_stage, archive_lead
 from .follow_up_views import update_lead_follow_up
 from .notes_views import add_notes
 from .consultation_views import update_lead_consultation
+from .consultation_views import start_consultation_form
+from .consultation_views import save_consultation_form
 
 __all__ = [
     "sales_pipeline",
@@ -15,4 +17,6 @@ __all__ = [
     "update_lead_follow_up",
     "add_notes",
     "update_lead_consultation",
+    "start_consultation_form",
+    "save_consultation_form",
 ]
