@@ -1,38 +1,32 @@
-from django.shortcuts import get_object_or_404
+import json
 from django.http import JsonResponse
-from django.utils.timezone import now
-from datetime import timedelta
-from sales_pipeline.models import Lead
+from django.shortcuts import get_object_or_404
+from sales_pipeline.models import Lead, LeadNotes
 
 def update_lead_follow_up(request, lead_id):
     """
-    Handles follow-up updates for a lead.
+    Handles follow-up actions: adding notes and marking follow-ups as done.
     """
+    lead = get_object_or_404(Lead, id=lead_id)
+
     if request.method == "POST":
         try:
-            lead = get_object_or_404(Lead, id=lead_id)
-            action = request.POST.get("action")
-            note = request.POST.get("note")
-            follow_up_days = int(request.POST.get("follow_up_days", 0))
+            data = json.loads(request.body)  # Parse JSON data
+            note = data.get("note", "").strip()
 
-            if action == "next_stage":
-                lead.stage = "Next Stage"
-                lead.follow_up_completed = True
-                lead.save()
-                return JsonResponse({"message": "Lead moved to the next stage!"}, status=200)
+            if not note:
+                return JsonResponse({"error": "Note is required!"}, status=400)
 
-            elif action == "add_note":
-                if note and follow_up_days > 0:
-                    lead.notes.create(content=note)
-                    lead.follow_up_date = now() + timedelta(days=follow_up_days)
-                    lead.follow_up_completed = False
-                    lead.save()
-                    return JsonResponse({"message": "Follow-up updated with a new note!"}, status=200)
+            # Save the note
+            LeadNotes.objects.create(lead=lead, notes=note)
 
-            return JsonResponse({"error": "Invalid action or parameters!"}, status=400)
+            # Mark follow-up as done
+            lead.follow_up_done = True
+            lead.save()
+
+            return JsonResponse({"message": "Follow-up updated successfully!"}, status=200)
 
         except Exception as e:
-            print("Error in update_lead_follow_up:", str(e))
-            return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+            return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Invalid request method!"}, status=405)
