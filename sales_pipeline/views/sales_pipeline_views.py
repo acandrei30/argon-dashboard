@@ -19,6 +19,7 @@ def sales_pipeline(request):
             "id", 
             "name", 
             "consultation_datetime", 
+            "location",
             "follow_up_date"
         ))
         for stage in stages.keys()

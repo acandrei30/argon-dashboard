@@ -18,9 +18,6 @@
 
     <!-- Sales Pipeline Table -->
     <div class="card">
-        <div class="card-header border-0">
-            <h3 class="mb-0">Sales Pipeline</h3>
-        </div>
         <div class="table-responsive">
             <table class="table align-items-center table-bordered">
                 <thead class="thead-light">
@@ -36,41 +33,40 @@
                             <td class="align-top">
                                 {% for lead in leads_by_stage|dict_get:stage %}
                                     <div class="py-2 d-flex flex-column border-bottom">
-                                        <!-- Lead Name -->
-                                        <a href="{% url 'lead_profile' lead.id %}" class="d-block font-weight-bold">
-                                            {{ lead.name }}
-                                        </a>
+                                        <!-- Lead Name and Location -->
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'lead_profile' lead.id %}" class="d-block text-dark font-weight-bold" style="font-size: 1.1rem;">
+                                                {{ lead.name }}
+                                            </a>
+                                            <span class="text-muted" style="font-size: 0.875rem; color: #8898aa;">{{ lead.location }}</span>
+                                        </div>
 
                                         <!-- Follow-Up Badge -->
                                         {% if lead.follow_up_date %}
                                             {% with lead.follow_up_date|date:"Y-m-d"|date_diff:today as days_until_follow_up %}
                                                 {% if days_until_follow_up == 0 %}
-                                                    <span class="badge badge-success">Follow-Up: Today</span>
+                                                    <span class="text-success" style="font-size: 0.875rem; display: inline-block;">Follow up today</span>
                                                 {% elif days_until_follow_up == 1 %}
-                                                    <span class="badge badge-warning">Follow-Up: Tomorrow</span>
+                                                    <span class="text-warning" style="font-size: 0.875rem; display: inline-block;">Follow up tomorrow</span>
                                                 {% elif days_until_follow_up < 0 %}
-                                                    <span class="badge badge-danger">Follow-Up: Overdue by {{ days_until_follow_up|abs_value }} days</span>
+                                                    <span class="text-danger" style="font-size: 0.875rem; display: inline-block;">Follow up overdue by {{ days_until_follow_up|abs_value }} days</span>
                                                 {% else %}
-                                                    <span class="badge badge-secondary">Follow-Up in {{ days_until_follow_up }} days</span>
+                                                    <span class="text-secondary" style="font-size: 0.875rem; color: #8898aa !important; display: inline-block;">Follow up in {{ days_until_follow_up }} days</span>
                                                 {% endif %}
                                             {% endwith %}
-                                        {% else %}
-                                            {% if stage == SalesPipelineStage.PROSPECTING %}
-                                                <span class="badge badge-secondary">New</span>
-                                            {% endif %}
                                         {% endif %}
 
                                         <!-- Consultation Badge -->
-                                        {% if stage == SalesPipelineStage.CONSULTATION_SCHEDULED and lead.consultation_datetime %}
+                                        {% if lead.consultation_datetime %}
                                             {% with lead.consultation_datetime|date:"Y-m-d"|date_diff:today as days_until_consultation %}
                                                 {% if days_until_consultation == 0 %}
-                                                    <span class="badge badge-success">Consultation: Today</span>
+                                                    <span class="text-success" style="font-size: 0.875rem;">Today</span>
                                                 {% elif days_until_consultation == 1 %}
-                                                    <span class="badge badge-warning">Consultation: Tomorrow</span>
+                                                    <span class="text-warning" style="font-size: 0.875rem;">Tomorrow</span>
                                                 {% elif days_until_consultation < 0 %}
-                                                    <span class="badge badge-danger">Consultation: Overdue by {{ days_until_consultation|abs_value }} days</span>
+                                                    <span class="text-danger" style="font-size: 0.875rem;">Overdue by {{ days_until_consultation|abs_value }} days</span>
                                                 {% else %}
-                                                    <span class="badge badge-secondary">Consultation in {{ days_until_consultation }} days</span>
+                                                    <span class="text-secondary" style="font-size: 0.875rem; color: #8898aa !important;">In {{ days_until_consultation }} days</span>
                                                 {% endif %}
                                             {% endwith %}
                                         {% endif %}
