@@ -3,19 +3,26 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
-            <h2 class="text-primary">Sales Pipeline</h2>
-        </div>
-        <div class="col-lg-6 col-5 text-right">
-            <a href="{% url 'add_lead' %}" class="btn btn-sm btn-primary">
-                <i class="ni ni-fat-add"></i> Add New Lead
-            </a>
-        </div>
-    </div>
+<!-- Header Section -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+      <div class="header-body">
+          <div class="row align-items-center py-4">
+              <div class="col-lg-6 col-7">
+                  <h6 class="h2 text-white d-inline-block mb-0">Sales Pipeline</h6>
+              </div>
+              <div class="col-lg-6 col-5 text-right">
+                  <a href="{% url 'add_lead' %}" class="btn btn-sm btn-neutral">
+                      <i class="ni ni-fat-add"></i> Add Lead
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
 
+<!-- Page content -->
+<div class="container-fluid mt--6">
     <!-- Sales Pipeline Table -->
     <div class="card">
         <div class="table-responsive">
@@ -38,7 +45,7 @@
                                             <a href="{% url 'lead_profile' lead.id %}" class="d-block text-dark font-weight-bold" style="font-size: 1.1rem;">
                                                 {{ lead.name }}
                                             </a>
-                                            <span class="text-muted" style="font-size: 0.875rem; color: #8898aa;">{{ lead.location }}</span>
+                                            <span class="text-muted" style="font-size: 0.875rem;">{{ lead.location }}</span>
                                         </div>
 
                                         <!-- Follow-Up Badge -->
@@ -54,10 +61,13 @@
                                                     <span class="text-secondary" style="font-size: 0.875rem; color: #8898aa !important; display: inline-block;">Follow up in {{ days_until_follow_up }} days</span>
                                                 {% endif %}
                                             {% endwith %}
+                                        {% elif stage == SalesPipelineStage.PROSPECTING %}
+                                            <!-- New Badge -->
+                                            <span class="text-warning" style="font-size: 0.875rem; display: inline-block;">New</span>
                                         {% endif %}
 
                                         <!-- Consultation Badge -->
-                                        {% if lead.consultation_datetime %}
+                                        {% if stage == SalesPipelineStage.CONSULTATION_SCHEDULED and lead.consultation_datetime %}
                                             {% with lead.consultation_datetime|date:"Y-m-d"|date_diff:today as days_until_consultation %}
                                                 {% if days_until_consultation == 0 %}
                                                     <span class="text-success" style="font-size: 0.875rem;">Today</span>
