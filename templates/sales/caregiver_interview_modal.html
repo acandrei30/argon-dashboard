@@ -1,0 +1,88 @@
+<div class="modal fade" id="caregiver-interview-modal" tabindex="-1" role="dialog" aria-labelledby="caregiver-interview-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="caregiver-interview-modal-label">Schedule Caregiver Interview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'schedule_caregiver_interview' lead.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Debugging Caregivers -->
+                    <p>Total caregivers: {{ caregivers|length }}</p>
+                    <ul>
+                        {% for caregiver in caregivers %}
+                            <li>{{ caregiver.name }} ({{ caregiver.stage }})</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="form-group">
+                        <label for="caregiver">Select Caregiver</label>
+                        <select id="caregiver" name="caregiver_id" class="form-control" required>
+                            {% if caregivers %}
+                                {% for caregiver in caregivers %}
+                                    <option value="{{ caregiver.id }}">{{ caregiver.name }} ({{ caregiver.stage }})</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">No caregivers available</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Interview Date -->
+                    <div class="form-group">
+                        <label for="interview-date">Interview Date</label>
+                        <input type="text" id="interview-date" name="interview_date" class="form-control" required>
+                    </div>
+
+                    <!-- Interview Time -->
+                    <div class="form-group">
+                        <label for="interview-time">Interview Time</label>
+                        <input type="text" id="interview-time" name="interview_time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Schedule Interview</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Debugging Modal Behavior
+    console.log("Caregiver modal loaded");
+
+    flatpickr("#interview-date", {
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        onReady: function () {
+            console.log("Flatpickr for interview-date initialized");
+        },
+    });
+
+    flatpickr("#interview-time", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        onReady: function () {
+            console.log("Flatpickr for interview-time initialized");
+        },
+    });
+
+     // Debugging Dropdown Content When Modal is Shown
+     document.getElementById("caregiver-interview-modal").addEventListener("shown.bs.modal", function () {
+        const caregiverDropdown = document.querySelector("#caregiver");
+        if (caregiverDropdown) {
+            console.log("Dropdown content:");
+            console.log(caregiverDropdown.innerHTML);
+        } else {
+            console.log("Dropdown not found!");
+        }
+    });
+</script>

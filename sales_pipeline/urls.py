@@ -9,7 +9,8 @@ from .views import (
     update_lead_consultation,
     archive_lead,
     start_consultation_form, 
-    save_consultation_form
+    save_consultation_form,
+    schedule_caregiver_interview
 )
 
 urlpatterns = [
@@ -33,4 +34,7 @@ urlpatterns = [
 
     # Consultation-related paths
     path("update_consultation/<int:lead_id>/", update_lead_consultation, name="update-lead-consultation"),
+
+    # Caregiver interview path
+    path("schedule-caregiver-interview/<int:lead_id>/", schedule_caregiver_interview, name="schedule_caregiver_interview"),
 ]

@@ -4,7 +4,7 @@ from django.utils.timezone import make_aware, get_current_timezone, is_aware  # 
 from datetime import datetime, date, time
 from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
 from django.utils.timezone import now  
-
+from recruitment.models import Caregiver, PipelineStage  # Import Caregiver model
 def add_lead(request):
     """
     View to add a new lead.
@@ -87,6 +87,7 @@ def lead_profile(request, lead_id):
     """
     lead = get_object_or_404(Lead, id=lead_id)
     consultation = getattr(lead, 'consultation', None)
+    caregivers = Caregiver.objects.all() 
 
     # Fetch notes in reverse chronological order
     notes = lead.notes.order_by('-created_at')  # Assuming "notes" is the related_name for LeadNotes
@@ -169,4 +170,5 @@ def lead_profile(request, lead_id):
         "previous_stage": previous_stage,
         "previous_action_label": previous_action_label,
         "consultation": consultation,
+        "caregivers": caregivers, 
     })

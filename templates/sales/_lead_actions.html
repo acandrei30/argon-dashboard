@@ -1,5 +1,5 @@
- <!-- Actions Dropdown -->
- <div class="btn-group">
+<!-- Actions Dropdown -->
+<div class="btn-group">
     <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Actions
     </button>
@@ -8,6 +8,12 @@
         {% if lead.stage == "Consultation Scheduled" %}
         <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
         {% endif %}
+
+        {% if lead.stage == "Caregiver Interview Scheduled" %}
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
+            Schedule Caregiver Interview
+        </button>
+    {% endif %}
 
         <!-- Next Action -->
         {% if next_action_label and next_stage %}
