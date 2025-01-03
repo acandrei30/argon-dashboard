@@ -1,90 +1,17 @@
 <div class="card-body">
-    <style>
-        /* Container styling */
-        .input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 10px;
-            padding: 5px;
-        }
-
-        /* Textarea styling */
-        textarea {
-            resize: none;
-            width: 100%;
-            border: none;
-            padding: 10px 50px 10px 35px; /* Adjust padding to avoid overlap with the icon */
-            border-radius: 10px;
-            background-color: transparent;
-            outline: none;
-            font-size: 14px;
-            color: #495057;
-        }
-
-        /* Attachment icon styling */
-        .attachment-icon {
-            position: absolute;
-            left: 10px; /* Keep the icon closer to the left edge */
-            font-size: 18px;
-            color: #5e72e4;
-            cursor: pointer;
-        }
-
-        /* Hidden file input */
-        #file-upload {
-            display: none;
-        }
-
-        /* Send button styling */
-        .send-button {
-            position: absolute;
-            right: 10px; /* Position to the far right */
-            background-color: #5e72e4;
-            border: none;
-            border-radius: 50%; /* Fully rounded */
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .send-button i {
-            color: white;
-            font-size: 16px;
-        }
-
-        .send-button:hover {
-            background-color: #4a63c6;
-        }
-    </style>
-
     <!-- Note Input -->
     <form method="POST" enctype="multipart/form-data" action="{% url 'add-notes' lead.id %}">
         {% csrf_token %}
-        <div class="input-container">
-            <!-- Attachment Icon -->
-            <label for="file-upload" class="attachment-icon">
-                <i class="fas fa-paperclip"></i>
-            </label>
-            <input id="file-upload" type="file" name="files">
-
-            <!-- Textarea -->
-            <textarea id="notes" name="notes" rows="2" placeholder="Enter notes for this lead"></textarea>
-
-            <!-- Send Button -->
-            <button type="submit" class="send-button">
-                <i class="ni ni-send"></i>
-            </button>
+        <div class="form-group">
+            <label for="notes">Add a Note</label>
+            <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Enter notes for this lead"></textarea>
         </div>
+        <div class="form-group">
+            <label for="files">Attach Files</label>
+            <input type="file" name="files" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-info">Save Notes</button>
     </form>
-</div>
-
-
 
     <div class="card-body">
         <!-- Timeline -->
