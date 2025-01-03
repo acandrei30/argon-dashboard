@@ -1,19 +1,90 @@
 {% if lead.consultation %}
-<div class="card mt-4">
+
     <div class="card-body">
-        <h5>Consultation Details</h5>
-        <p><strong>Alertness:</strong> {{ lead.consultation.alertness }}</p>
-        <p><strong>Lives Alone:</strong> {{ lead.consultation.lives_alone }}</p>
-        <p><strong>House Suitable:</strong> {{ lead.consultation.house_suitable }}</p>
-        <p><strong>Speech Impairment:</strong> {{ lead.consultation.speech_impairment }}</p>
-        <p><strong>Sight Impairment:</strong> {{ lead.consultation.sight_impairment }}</p>
-        <p><strong>Hearing Impairment:</strong> {{ lead.consultation.hearing_impairment }}</p>
-        <p><strong>Locomotive Impairment:</strong> {{ lead.consultation.locomotive_impairment }}</p>
-        <p><strong>Lifting Required:</strong> {{ lead.consultation.lifting_required }}</p>
-        <p><strong>Personal Help Required:</strong> {{ lead.consultation.personal_help }}</p>
-        <p><strong>Allergies:</strong> {{ lead.consultation.allergies }}</p>
-        <p><strong>Recent Hospitalization:</strong> {{ lead.consultation.recent_hospitalization }}</p>
-        <p><strong>Hospitalization Reason:</strong> {{ lead.consultation.hospitalization_reason }}</p>
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Alertness -->
+            <div class="form-group">
+                <label for="alertness">Alertness</label>
+                <input type="text" id="alertness" name="alertness" class="form-control" value="{{ lead.consultation.alertness }}">
+            </div>
+
+            <!-- Lives Alone -->
+            <div class="form-group">
+                <label for="lives_alone">Lives Alone</label>
+                <select id="lives_alone" name="lives_alone" class="form-control">
+                    <option value="yes" {% if lead.consultation.lives_alone == "yes" %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if lead.consultation.lives_alone == "no" %}selected{% endif %}>No</option>
+                </select>
+            </div>
+
+            <!-- House Suitable -->
+            <div class="form-group">
+                <label for="house_suitable">House Suitable</label>
+                <input type="text" id="house_suitable" name="house_suitable" class="form-control" value="{{ lead.consultation.house_suitable }}">
+            </div>
+
+            <!-- Speech Impairment -->
+            <div class="form-group">
+                <label for="speech_impairment">Speech Impairment</label>
+                <input type="text" id="speech_impairment" name="speech_impairment" class="form-control" value="{{ lead.consultation.speech_impairment }}">
+            </div>
+
+            <!-- Sight Impairment -->
+            <div class="form-group">
+                <label for="sight_impairment">Sight Impairment</label>
+                <input type="text" id="sight_impairment" name="sight_impairment" class="form-control" value="{{ lead.consultation.sight_impairment }}">
+            </div>
+
+            <!-- Hearing Impairment -->
+            <div class="form-group">
+                <label for="hearing_impairment">Hearing Impairment</label>
+                <input type="text" id="hearing_impairment" name="hearing_impairment" class="form-control" value="{{ lead.consultation.hearing_impairment }}">
+            </div>
+
+            <!-- Locomotive Impairment -->
+            <div class="form-group">
+                <label for="locomotive_impairment">Locomotive Impairment</label>
+                <input type="text" id="locomotive_impairment" name="locomotive_impairment" class="form-control" value="{{ lead.consultation.locomotive_impairment }}">
+            </div>
+
+            <!-- Lifting Required -->
+            <div class="form-group">
+                <label for="lifting_required">Lifting Required</label>
+                <input type="text" id="lifting_required" name="lifting_required" class="form-control" value="{{ lead.consultation.lifting_required }}">
+            </div>
+
+            <!-- Personal Help -->
+            <div class="form-group">
+                <label for="personal_help">Personal Help Required</label>
+                <input type="text" id="personal_help" name="personal_help" class="form-control" value="{{ lead.consultation.personal_help }}">
+            </div>
+
+            <!-- Allergies -->
+            <div class="form-group">
+                <label for="allergies">Allergies</label>
+                <textarea id="allergies" name="allergies" class="form-control" rows="3">{{ lead.consultation.allergies }}</textarea>
+            </div>
+
+            <!-- Recent Hospitalization -->
+            <div class="form-group">
+                <label for="recent_hospitalization">Recent Hospitalization</label>
+                <select id="recent_hospitalization" name="recent_hospitalization" class="form-control">
+                    <option value="yes" {% if lead.consultation.recent_hospitalization == "yes" %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if lead.consultation.recent_hospitalization == "no" %}selected{% endif %}>No</option>
+                </select>
+            </div>
+
+            <!-- Hospitalization Reason -->
+            <div class="form-group">
+                <label for="hospitalization_reason">Hospitalization Reason</label>
+                <textarea id="hospitalization_reason" name="hospitalization_reason" class="form-control" rows="3">{{ lead.consultation.hospitalization_reason }}</textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
     </div>
-</div>
+
 {% endif %}

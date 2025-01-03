@@ -20,26 +20,55 @@
             <span class="badge badge-info">{{ lead.stage }}</span>
             <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
             {% include 'sales/_lead_actions.html' %}
-           
         </div>
     </div>
 
-    <div class="card-body">
-        <!-- Timeline and Note Input -->
-        <div class="row">
-            <div class="col-xl-8">
-                {% include 'sales/_lead_form.html' %}
+    <div class="row">
+        <!-- First Column: Lead Details -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Lead Details</h4>
+                </div>
+                <div class="card-body">
+                    {% include 'sales/_lead_form.html' %}
+                </div>
             </div>
-            <div class="col-xl-4">
-                <!-- Right Sidebar Section -->
-                <div class="card">
-                 
-          
+        </div>
+
+        <!-- Second Column: Consultation Details -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Consultation Details</h4>
+                </div>
+                <div class="card-body">
+                    {% if not lead.consultation_datetime %}
+                        <p class="text-muted">Consultation not done</p>
+                    {% elif not lead.consultation %}
+                        <p class="text-muted">Consultation scheduled on {{ lead.consultation_datetime|date:"Y-m-d H:i" }}</p>
+                    {% else %}
+                        {% include 'sales/_lead_consultation.html' %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Column: Action Trail -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Action Trail</h4>
+                </div>
+                <div class="card-body">
                     {% include 'sales/_lead_notes.html' %}
-        <!-- Modal for Scheduling Consultation -->
-        {% include 'sales/consultation_modal.html' %}
-        {% include 'sales/_lead_consultation.html' %}
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Modal for Scheduling Consultation -->
+    {% include 'sales/consultation_modal.html' %}
 </div>
 {% endblock content %}
 
@@ -51,7 +80,7 @@
   </script>
   <script src="{% static 'assets/js/follow_up.js' %}"></script>
   <script src="{% static 'assets/js/consultation.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
   <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
   <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
   <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script>

@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from sales_pipeline.models import Lead, SalesPipelineStage
+from sales_pipeline.models import Lead, Consultation, LeadNotes 
+from django.utils.timezone import now
 
 def update_lead_consultation(request, lead_id):
     """
@@ -59,7 +61,13 @@ def save_consultation_form(request, lead_id):
         consultation.hospitalization_reason = request.POST.get("hospitalization_reason")
         consultation.save()
 
+        # Add a note to the action trail
+        LeadNotes.objects.create(
+            lead=lead,
+            notes="Consultation completed",
+            created_at=now()
+        )
+
         return redirect("lead_profile", lead_id=lead.id)
 
     return redirect("lead_profile", lead_id=lead_id)
-

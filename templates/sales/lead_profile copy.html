@@ -19,83 +19,56 @@
             <!-- Current Stage and Back Button -->
             <span class="badge badge-info">{{ lead.stage }}</span>
             <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
-            
-            <!-- Actions Dropdown -->
-            <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Actions
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <!-- Start Consultation -->
-                    {% if lead.stage == "Consultation Scheduled" %}
-                    <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
-                    {% endif %}
-                    
-                    <!-- Next Action -->
-                    {% if next_action_label and next_stage %}
-                    {% if next_stage == 'Consultation Scheduled' %}
-                    <button type="button" class="dropdown-item" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
+            {% include 'sales/_lead_actions.html' %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- First Column: Lead Details -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Lead Details</h4>
+                </div>
+                <div class="card-body">
+                    {% include 'sales/_lead_form.html' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Column: Consultation Details -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Consultation Details</h4>
+                </div>
+                <div class="card-body">
+                    {% if not lead.consultation_datetime %}
+                        <p class="text-muted">Consultation not done</p>
+                    {% elif not lead.consultation %}
+                        <p class="text-muted">Consultation scheduled on {{ lead.consultation_datetime|date:"Y-m-d H:i" }}</p>
                     {% else %}
-                    <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
-                    </form>
+                        {% include 'sales/_lead_consultation.html' %}
                     {% endif %}
-                    {% endif %}
-                    
-                    <!-- Previous Stage -->
-                    {% if previous_stage %}
-                    <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
-                    </form>
-                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-                    <!-- Archive -->
-                    <form method="POST" action="{% url 'archive-lead' lead.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
-                    </form>
+        <!-- Third Column: Action Trail -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Action Trail</h4>
+                </div>
+                <div class="card-body">
+                    {% include 'sales/_lead_notes.html' %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card-body">
-        {% if lead.stage == "Consultation Scheduled" %}
-        <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
-        {% endif %}
-
-        {% include 'sales/_lead_followup.html' %}
-
-        <!-- Lead Form Section -->
-        <div class="row">
-            <div class="col-xl-8">
-                {% include 'sales/_lead_form.html' %}
-            </div>
-            <div class="col-xl-4">
-                <!-- Right Sidebar Section -->
-                <div class="card">
-                    <div class="card-body">
-                        <h5>Consultation Date & Time</h5>
-                        <p id="consultation-datetime">
-                            {% if lead.consultation_datetime %}
-                                {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
-                                <button id="edit-consultation" class="btn btn-sm btn-secondary">Edit</button>
-                            {% else %}
-                                Not Scheduled
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
-                {% include 'sales/_lead_notes.html' %}
-            </div>
-        </div>
-
-        <!-- Modal for Scheduling Consultation -->
-        {% include 'sales/consultation_modal.html' %}
-        {% include 'sales/_lead_consultation.html' %}
-    </div>
+    <!-- Modal for Scheduling Consultation -->
+    {% include 'sales/consultation_modal.html' %}
 </div>
 {% endblock content %}
 
@@ -107,7 +80,7 @@
   </script>
   <script src="{% static 'assets/js/follow_up.js' %}"></script>
   <script src="{% static 'assets/js/consultation.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
   <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
   <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
   <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script>

@@ -68,15 +68,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.timezone import now, is_aware, make_aware
+from datetime import datetime, date, time
+from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
+
 def normalize_datetime(value):
     """
-    Ensures the given value is a timezone-aware datetime object.
-    Converts naive datetime or date objects into timezone-aware datetime.
+    Normalize datetime to ensure it's timezone-aware.
     """
-    if isinstance(value, datetime):  # Check for datetime
-        return make_aware(value) if not is_aware(value) else value
-    elif isinstance(value, date):  # Check for date
-        return make_aware(datetime.combine(value, time.min), get_current_timezone())
+    if isinstance(value, datetime):
+        return value if is_aware(value) else make_aware(value)
     return None
 
 def lead_profile(request, lead_id):
@@ -84,6 +86,7 @@ def lead_profile(request, lead_id):
     View to display the profile of a single lead.
     """
     lead = get_object_or_404(Lead, id=lead_id)
+    consultation = getattr(lead, 'consultation', None)
 
     # Fetch notes in reverse chronological order
     notes = lead.notes.order_by('-created_at')  # Assuming "notes" is the related_name for LeadNotes
@@ -93,29 +96,29 @@ def lead_profile(request, lead_id):
     for note in notes:
         timeline.append({
             "type": "Note",
-            "created_at": note.created_at,  # Use the note's creation time (already timezone-aware)
-            "details": note.notes,  # Include note content
-            "file": note.file.url if note.file else None,  # Include file if available
+            "created_at": normalize_datetime(note.created_at),  # Normalize datetime
+            "details": note.notes,
+            "file": note.file.url if note.file else None,
         })
 
     # Add consultation to the timeline
     if lead.consultation_datetime:
-        consultation_creation_time = lead.consultation_creation_time or now()  # Ensure consultation event has a creation timestamp
+        consultation_creation_time = lead.consultation_creation_time or now()
         timeline.append({
             "type": "Consultation",
-            "created_at": consultation_creation_time,  # Use actual creation timestamp
-            "details": f"Consultation scheduled for {lead.consultation_datetime.strftime('%Y-%m-%d at %H:%M')}",  # Scheduled date in title
-            "scheduled_date": lead.consultation_datetime,  # Include scheduled date for display
+            "created_at": normalize_datetime(consultation_creation_time),
+            "details": f"Consultation scheduled for {lead.consultation_datetime.strftime('%Y-%m-%d at %H:%M')}",
+            "scheduled_date": normalize_datetime(lead.consultation_datetime),
         })
 
     # Add follow-up to the timeline
     if lead.follow_up_date:
-        follow_up_creation_time = lead.follow_up_creation_time or now()  # Ensure follow-up event has a creation timestamp
+        follow_up_creation_time = lead.follow_up_creation_time or now()
         timeline.append({
             "type": "Follow-Up",
-            "created_at": follow_up_creation_time,  # Use actual creation timestamp
-            "details": f"Follow-up scheduled for {lead.follow_up_date.strftime('%Y-%m-%d')}",  # Scheduled date in title
-            "scheduled_date": normalize_datetime(datetime.combine(lead.follow_up_date, datetime.min.time())),  # Scheduled date for display
+            "created_at": normalize_datetime(follow_up_creation_time),
+            "details": f"Follow-up scheduled for {lead.follow_up_date.strftime('%Y-%m-%d')}",
+            "scheduled_date": normalize_datetime(datetime.combine(lead.follow_up_date, time.min)),
         })
 
     # Sort the timeline by created_at in descending order
@@ -165,4 +168,5 @@ def lead_profile(request, lead_id):
         "next_action_label": next_action_label,
         "previous_stage": previous_stage,
         "previous_action_label": previous_action_label,
+        "consultation": consultation,
     })
