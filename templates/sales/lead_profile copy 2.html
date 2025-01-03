@@ -1,0 +1,137 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  <!-- Page plugins -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock extrastyle %}
+
+{% block title %} Lead Profile {% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section with Lead Info -->
+    <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+            <h1 class="text-primary d-inline">{{ lead.name }}</h1>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+            <!-- Current Stage and Back Button -->
+            <span class="badge badge-info">{{ lead.stage }}</span>
+            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
+
+            <!-- Actions Dropdown -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Actions
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <!-- Start Consultation -->
+                    {% if lead.stage == "Consultation Scheduled" %}
+                    <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
+                    {% endif %}
+
+                    <!-- Next Action -->
+                    {% if next_action_label and next_stage %}
+                    {% if next_stage == 'Consultation Scheduled' %}
+                    <button type="button" class="dropdown-item" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
+                    {% else %}
+                    <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
+                    </form>
+                    {% endif %}
+                    {% endif %}
+
+                    <!-- Previous Stage -->
+                    {% if previous_stage %}
+                    <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+                    </form>
+                    {% endif %}
+
+                    <!-- Archive -->
+                    <form method="POST" action="{% url 'archive-lead' lead.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Timeline and Note Input -->
+        <div class="row">
+            <div class="col-xl-8">
+                {% include 'sales/_lead_form.html' %}
+            </div>
+            <div class="col-xl-4">
+                <!-- Right Sidebar Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Actions Trail</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Note Input -->
+                        <form method="POST" enctype="multipart/form-data" action="{% url 'add-notes' lead.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="notes">Add a Note</label>
+                                <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Enter notes for this lead"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="files">Attach Files</label>
+                                <input type="file" name="files" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-info">Save Notes</button>
+                        </form>
+
+                        <div class="timeline timeline-one-side mt-4" data-timeline-content="axis" data-timeline-axis-style="dashed">
+                            {% with combined_trail=notes|add:extra_events|dictsortreversed:"created_at" %}
+                            {% for entry in combined_trail %}
+                            <div class="timeline-block">
+                                <span class="timeline-step {{ entry.icon_color }}">
+                                    <i class="{{ entry.icon }}"></i>
+                                </span>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between pt-1">
+                                        <div>
+                                            <span class="text-muted text-sm font-weight-bold">{{ entry.title }}</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <small class="text-muted"><i class="fas fa-clock mr-1"></i>{{ entry.timestamp|date:"Y-m-d H:i" }}</small>
+                                        </div>
+                                    </div>
+                                    <h6 class="text-sm mt-1 mb-0">{{ entry.details }}</h6>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Scheduling Consultation -->
+        {% include 'sales/consultation_modal.html' %}
+        {% include 'sales/_lead_consultation.html' %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+  <script>
+    const csrfToken = "{{ csrf_token }}";
+    const updateConsultationUrl = "{% url 'update-lead-consultation' lead.id %}";
+    const updateFollowUpUrl = "{% url 'update-lead-follow-up' lead.id %}";
+  </script>
+  <script src="{% static 'assets/js/follow_up.js' %}"></script>
+  <script src="{% static 'assets/js/consultation.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="{% static 'assets/vendor/moment/min/moment.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/fullcalendar/dist/fullcalendar.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/sweetalert2/dist/sweetalert2.min.js' %}"></script>
+{% endblock extra_js %}

@@ -1,43 +1,38 @@
-<!-- _lead_actions.html -->
-<div class="card mt-4">
-    <div class="card-header">
-        <h4>Actions</h4>
-    </div>
-    <div class="card-body">
-        {% if lead.stage == "consultation" %}
-    <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
-{% endif %}
+ <!-- Actions Dropdown -->
+ <div class="btn-group">
+    <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Actions
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <!-- Start Consultation -->
+        {% if lead.stage == "Consultation Scheduled" %}
+        <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
+        {% endif %}
+
+        <!-- Next Action -->
         {% if next_action_label and next_stage %}
-        <!-- Check if the next stage is "Consultation Scheduled" -->
         {% if next_stage == 'Consultation Scheduled' %}
-        <!-- Trigger the modal if next stage is 'Consultation Scheduled' -->
-        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
         {% else %}
-        <!-- Regular button for other stages -->
         <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
             {% csrf_token %}
-            <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
+            <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
         </form>
         {% endif %}
         {% endif %}
-    
-        <div class="dropdown d-inline-block ml-2">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Other
-            </button>
-            <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
-                {% if previous_stage %}
-                <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
-                    {% csrf_token %}
-                    <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
-                </form>
-                {% endif %}
-                <form method="POST" action="{% url 'archive-lead' lead.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
-                </form>
-            </div>
-        </div>
+
+        <!-- Previous Stage -->
+        {% if previous_stage %}
+        <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+        </form>
+        {% endif %}
+
+        <!-- Archive -->
+        <form method="POST" action="{% url 'archive-lead' lead.id %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
+        </form>
     </div>
-  </div>
-  
+</div>

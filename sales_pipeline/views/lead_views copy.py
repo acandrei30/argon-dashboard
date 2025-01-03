@@ -1,8 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.utils.timezone import make_aware, get_current_timezone, is_aware  # Properly import get_current_timezone
-from datetime import datetime, date, time
-from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
+from sales_pipeline.models import Lead
+from datetime import datetime
 
 def add_lead(request):
     """
@@ -64,19 +63,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from sales_pipeline.models import Lead, SalesPipelineStage
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
 from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
-
-def normalize_datetime(value):
-    """
-    Ensures the given value is a timezone-aware datetime object.
-    Converts naive datetime or date objects into timezone-aware datetime.
-    """
-    if isinstance(value, datetime):  # Check for datetime
-        return make_aware(value) if not is_aware(value) else value
-    elif isinstance(value, date):  # Check for date
-        return make_aware(datetime.combine(value, time.min), get_current_timezone())
-    return None
 
 def lead_profile(request, lead_id):
     """
@@ -84,37 +71,30 @@ def lead_profile(request, lead_id):
     """
     lead = get_object_or_404(Lead, id=lead_id)
 
-    # Fetch notes in reverse chronological order
-    notes = lead.notes.order_by('-created_at')  # Assuming "notes" is the related_name for LeadNotes
-    timeline = []  # Initialize timeline
-
-    # Add notes to the timeline
+    # Fetch related notes and prepare them for the timeline
+    notes = lead.notes.all().values("notes", "created_at")  # Assuming "notes" is the related_name for LeadNotes
     for note in notes:
-        timeline.append({
-            "type": "Note",
-            "created_at": normalize_datetime(note.created_at),
-            "details": note.notes,  # Include the content of the note
-            "file": note.file.url if note.file else None,  # Include file link if available
-        })
+        note["type"] = "Note"  # Mark as a Note for the timeline
 
-    # Add consultation to the timeline
-    if lead.consultation_datetime:
-        timeline.append({
-            "type": "Consultation",
-            "created_at": normalize_datetime(lead.consultation_datetime),
-            "details": "Consultation Scheduled",  # Static content for consultation
-        })
+    # Fetch follow-up and consultation details
+    timeline_entries = list(notes)  # Start with the notes in the timeline
 
-    # Add follow-up to the timeline
     if lead.follow_up_date:
-        timeline.append({
+        timeline_entries.append({
             "type": "Follow-Up",
-            "created_at": normalize_datetime(lead.follow_up_date),
-            "details": "Follow-Up Scheduled",  # Static content for follow-up
+            "created_at": lead.follow_up_date,
+            "details": "Follow-Up Scheduled",
         })
 
-    # Sort the timeline by created_at in descending order
-    timeline = sorted(timeline, key=lambda x: x["created_at"], reverse=True)
+    if lead.consultation_date:
+        timeline_entries.append({
+            "type": "Consultation",
+            "created_at": lead.consultation_date,
+            "details": "Consultation Scheduled",
+        })
+
+    # Sort all timeline entries by `created_at` in descending order
+    timeline = sorted(timeline_entries, key=lambda x: x["created_at"], reverse=True)
 
     # Define pipeline stages in order
     stages = [
@@ -155,7 +135,7 @@ def lead_profile(request, lead_id):
 
     return render(request, "sales/lead_profile.html", {
         "lead": lead,
-        "timeline": timeline,  # Unified timeline for the template
+        "timeline": timeline,  # Pass the unified and sorted timeline to the template
         "next_stage": next_stage,
         "next_action_label": next_action_label,
         "previous_stage": previous_stage,

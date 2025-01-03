@@ -19,18 +19,13 @@
             <!-- Current Stage and Back Button -->
             <span class="badge badge-info">{{ lead.stage }}</span>
             <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
+            {% include 'sales/_lead_actions.html' %}
+           
         </div>
     </div>
 
     <div class="card-body">
-
-        {% if lead.stage == "Consultation Scheduled" %}
-        <a href="{% url 'start-consultation-form' lead.id %}" class="btn btn-sm btn-success">Start Consultation Form</a>
-        {% endif %}
-
-        {% include 'sales/_lead_followup.html' %}
-
-        <!-- Lead Form Section -->
+        <!-- Timeline and Note Input -->
         <div class="row">
             <div class="col-xl-8">
                 {% include 'sales/_lead_form.html' %}
@@ -38,27 +33,14 @@
             <div class="col-xl-4">
                 <!-- Right Sidebar Section -->
                 <div class="card">
-                    <div class="card-body">
-                        <h5>Consultation Date & Time</h5>
-                        <p id="consultation-datetime">
-                            {% if lead.consultation_datetime %}
-                                {{ lead.consultation_datetime|date:"Y-m-d H:i" }}
-                                <button id="edit-consultation" class="btn btn-sm btn-secondary">Edit</button>
-                            {% else %}
-                                Not Scheduled
-                            {% endif %}
-                        </p>
+                    <div class="card-header">
+                        <h4>Actions Trail</h4>
                     </div>
-                </div>
-                {% include 'sales/_lead_actions.html' %}
-                {% include 'sales/_lead_notes.html' %}
-            </div>
-        </div>
-
+          
+                    {% include 'sales/_lead_notes.html' %}
         <!-- Modal for Scheduling Consultation -->
         {% include 'sales/consultation_modal.html' %}
         {% include 'sales/_lead_consultation.html' %}
-
     </div>
 </div>
 {% endblock content %}

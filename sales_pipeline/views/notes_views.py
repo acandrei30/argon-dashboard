@@ -4,23 +4,32 @@ from sales_pipeline.models import Lead, LeadNotes
 
 def add_notes(request, lead_id):
     """
-    Adds a note or file to a lead.
+    Adds a note to a lead.
     """
     lead = get_object_or_404(Lead, id=lead_id)
 
     if request.method == "POST":
-        # Fetch notes and file from the request
-        notes = request.POST.get("notes", "").strip()
-        file = request.FILES.get("file")  # Match the `name` attribute in your HTML
+        try:
+            # Extract note content and file from the request
+            note_content = request.POST.get("notes", "")
+            file = request.FILES.get("file")
 
-        # Save the note or file to the database
-        if notes or file:
-            LeadNotes.objects.create(lead=lead, notes=notes, file=file)
+            # Check if either note content or file is provided
+            if not note_content and not file:
+                return JsonResponse({"error": "A note or a file must be provided."}, status=400)
 
-            # Redirect to the lead profile page after successful save
+            # Create a new note entry
+            LeadNotes.objects.create(
+                lead=lead,
+                notes=note_content,
+                file=file,
+            )
+
+            # Redirect back to the lead profile page
             return redirect("lead_profile", lead_id=lead.id)
 
-        # Return an error if neither notes nor file is provided
-        return JsonResponse({"error": "A note or file must be provided."}, status=400)
+        except Exception:
+            # Return error message without printing
+            return JsonResponse({"error": "An unexpected error occurred while adding the note."}, status=500)
 
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+    return JsonResponse({"error": "Invalid request method!"}, status=405)
