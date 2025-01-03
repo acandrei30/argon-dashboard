@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.utils.timezone import make_aware, get_current_timezone, is_aware  # Properly import get_current_timezone
 from datetime import datetime, date, time
 from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
+from django.utils.timezone import now  
 
 def add_lead(request):
     """
@@ -92,25 +93,29 @@ def lead_profile(request, lead_id):
     for note in notes:
         timeline.append({
             "type": "Note",
-            "created_at": normalize_datetime(note.created_at),
-            "details": note.notes,  # Include the content of the note
-            "file": note.file.url if note.file else None,  # Include file link if available
+            "created_at": note.created_at,  # Use the note's creation time (already timezone-aware)
+            "details": note.notes,  # Include note content
+            "file": note.file.url if note.file else None,  # Include file if available
         })
 
     # Add consultation to the timeline
     if lead.consultation_datetime:
+        consultation_creation_time = lead.consultation_creation_time or now()  # Ensure consultation event has a creation timestamp
         timeline.append({
             "type": "Consultation",
-            "created_at": normalize_datetime(lead.consultation_datetime),
-            "details": "Consultation Scheduled",  # Static content for consultation
+            "created_at": consultation_creation_time,  # Use actual creation timestamp
+            "details": f"Consultation scheduled for {lead.consultation_datetime.strftime('%Y-%m-%d at %H:%M')}",  # Scheduled date in title
+            "scheduled_date": lead.consultation_datetime,  # Include scheduled date for display
         })
 
     # Add follow-up to the timeline
     if lead.follow_up_date:
+        follow_up_creation_time = lead.follow_up_creation_time or now()  # Ensure follow-up event has a creation timestamp
         timeline.append({
             "type": "Follow-Up",
-            "created_at": normalize_datetime(lead.follow_up_date),
-            "details": "Follow-Up Scheduled",  # Static content for follow-up
+            "created_at": follow_up_creation_time,  # Use actual creation timestamp
+            "details": f"Follow-up scheduled for {lead.follow_up_date.strftime('%Y-%m-%d')}",  # Scheduled date in title
+            "scheduled_date": normalize_datetime(datetime.combine(lead.follow_up_date, datetime.min.time())),  # Scheduled date for display
         })
 
     # Sort the timeline by created_at in descending order

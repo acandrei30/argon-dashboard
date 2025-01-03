@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class SalesPipelineStage(models.TextChoices):
     PROSPECTING = 'Prospecting', 'Prospecting'
@@ -18,14 +19,16 @@ class Lead(models.Model):
     reason = models.TextField(null=True, blank=True)
     follow_up = models.CharField(max_length=20, null=True, blank=True)
     location = models.CharField(max_length=255, default="Unknown")
-    follow_up_date = models.DateField(null=True, blank=True)  # Add this field if missing
-    status = models.CharField(max_length=50, null=True, blank=True)  # Add this field if missing
+    follow_up_date = models.DateField(null=True, blank=True) 
+    follow_up_creation_time = models.DateTimeField(null=True, blank=True, default=now)
+    status = models.CharField(max_length=50, null=True, blank=True) 
     stage = models.CharField(
         max_length=50,
         choices=SalesPipelineStage.choices,
         default=SalesPipelineStage.PROSPECTING,
     )
     consultation_datetime = models.DateTimeField(null=True, blank=True)
+    consultation_creation_time = models.DateTimeField(null=True, blank=True, default=now)
 
     # New fields
     relation = models.CharField(
