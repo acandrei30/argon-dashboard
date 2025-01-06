@@ -16,9 +16,10 @@
             <h1 class="text-primary d-inline">{{ lead.name }}</h1>
         </div>
         <div class="col-lg-6 col-5 text-right">
-            <!-- Current Stage and Back Button -->
             <span class="badge badge-info">{{ lead.stage }}</span>
-            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary"><i class="ni ni-bold-left"></i> Back to Pipeline</a>
+            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
+                <i class="ni ni-bold-left"></i> Back to Pipeline
+            </a>
             {% include 'sales/_lead_actions.html' %}
         </div>
     </div>
@@ -36,8 +37,19 @@
             </div>
         </div>
 
-        <!-- Second Column: Consultation Details -->
+        <!-- Second Column: Service Details and Consultation Details -->
         <div class="col-md-4">
+            <!-- Service Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Service Details</h4>
+                </div>
+                <div class="card-body">
+                    {% include "sales/service_details.html" %}
+                </div>
+            </div>
+
+            <!-- Consultation Details -->
             <div class="card">
                 <div class="card-header">
                     <h4>Consultation Details</h4>
@@ -70,8 +82,11 @@
     <!-- Modal for Scheduling Consultation -->
     {% include 'sales/consultation_modal.html' %}
 
-    <!-- Modal for Scheduling Consultation -->
+    <!-- Modal for Scheduling Caregiver Interview -->
     {% include 'sales/caregiver_interview_modal.html' %}
+
+    <!-- Modal for Starting Service -->
+    {% include 'sales/start_service_modal.html' %}
 </div>
 {% endblock content %}
 

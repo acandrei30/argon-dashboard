@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from recruitment.models import Caregiver
 
 class SalesPipelineStage(models.TextChoices):
     PROSPECTING = 'Prospecting', 'Prospecting'
@@ -8,6 +9,7 @@ class SalesPipelineStage(models.TextChoices):
     CAREGIVER_INTERVIEW_SCHEDULED = 'Caregiver Interview Scheduled', 'Caregiver Interview Scheduled'
     CAREGIVER_CONSIDERATION = 'Caregiver Consideration', 'Caregiver Consideration'
     READY_FOR_SERVICE = 'Ready for Service', 'Ready for Service'
+    ACTIVE_CLIENT = 'Active Client', 'Active Client'
 
 from django.db import models
 
@@ -21,7 +23,7 @@ class Lead(models.Model):
     location = models.CharField(max_length=255, default="Unknown")
     follow_up_date = models.DateField(null=True, blank=True) 
     follow_up_creation_time = models.DateTimeField(null=True, blank=True, default=now)
-    status = models.CharField(max_length=50, null=True, blank=True) 
+    status = models.CharField(max_length=50, null=True, blank=True)
     stage = models.CharField(
         max_length=50,
         choices=SalesPipelineStage.choices,
@@ -30,7 +32,23 @@ class Lead(models.Model):
     consultation_datetime = models.DateTimeField(null=True, blank=True)
     consultation_creation_time = models.DateTimeField(null=True, blank=True, default=now)
 
-    # New fields
+    # New fields for client management
+    caregiver = models.ForeignKey(
+        Caregiver,  # Foreign key to Caregiver model
+        on_delete=models.SET_NULL,  # Set caregiver to null if deleted
+        null=True,
+        blank=True,
+        related_name="leads"  # Backward relationship from Caregiver to Leads
+    )
+    start_date = models.DateField(null=True, blank=True)  # Client start date
+    end_date = models.DateField(null=True, blank=True)  # Optional end date for service
+    days_per_week = models.FloatField(null=True, blank=True)  # Work days per week
+    hours_per_day = models.FloatField(null=True, blank=True)  # Work hours per day
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Price for the client
+    caregiver_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Caregiver salary
+    additional_details = models.TextField(null=True, blank=True)  # Additional client-specific details
+
+    # Other existing fields
     relation = models.CharField(
         max_length=50,
         null=True,
@@ -56,8 +74,6 @@ class Lead(models.Model):
 
     def __str__(self):
         return self.name
-
-
 
 class LeadNotes(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name="notes")

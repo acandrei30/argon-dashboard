@@ -9,5 +9,6 @@ urlpatterns = [
     path("archive/<int:caregiver_id>/", views.archive_caregiver, name="archive-caregiver"),
     path("caregiver/<int:caregiver_id>/move-backward/", views.move_backward_stage, name="move-backward-stage"),
     path('caregiver/<int:caregiver_id>/add-notes/', views.add_notes, name='add-notes'),
+
 ]
     

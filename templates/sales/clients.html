@@ -1,0 +1,82 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+      <div class="header-body">
+          <div class="row align-items-center py-4">
+              <div class="col-lg-6 col-7">
+                  <h6 class="h2 text-white d-inline-block mb-0">Clients</h6>
+              </div>
+              <div class="col-lg-6 col-5 text-right">
+                  <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-neutral">
+                      <i class="ni ni-bold-left"></i> Back to Sales Pipeline
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Page Content -->
+<div class="container-fluid mt--6">
+    <!-- Clients Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table align-items-center table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Package</th>
+                        <th scope="col">Caregiver Assigned</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>
+                            <a href="{% url 'lead_profile' client.id %}" class="text-dark font-weight-bold">
+                                {{ client.name }}
+                            </a>
+                        </td>
+                        <td>{{ client.location }}</td>
+                        <td>
+                            {{ client.days_per_week|default:"-" }}d 
+                            {{ client.hours_per_day|default:"-" }}h
+                        </td>
+                        <td>
+                            {% if client.caregiver %}
+                                {{ client.caregiver.name }}
+                            {% else %}
+                                <span class="text-muted">Not Assigned</span>
+                            {% endif %}
+                        </td>
+                        <td>CHF {{ client.price|floatformat:2 }}</td>
+                        <td>
+                            {% if client.start_date and client.start_date > today %}
+                                <span class="text-warning">To start on {{ client.start_date|date:"Y-m-d" }}</span>
+                            {% else %}
+                                <span class="text-success font-weight-bold">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No clients available
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

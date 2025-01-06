@@ -12,6 +12,7 @@ from .views import (
     save_consultation_form,
     schedule_caregiver_interview
 )
+from .views.clients_views import clients, mark_ready_to_service  # Updated import
 
 urlpatterns = [
     # Pipeline-related paths
@@ -25,11 +26,10 @@ urlpatterns = [
 
     # Stage management paths
     path("update_stage/<int:lead_id>/<str:new_stage>/", update_stage, name="update-stage"),
-     path("archive_lead/<int:lead_id>/", archive_lead, name="archive-lead"),  
+    path("archive_lead/<int:lead_id>/", archive_lead, name="archive-lead"),  
 
     # Follow-up and notes paths
     path("update_follow_up/<int:lead_id>/", update_lead_follow_up, name="update-lead-follow-up"),
-    
     path("add_notes/<int:lead_id>/", add_notes, name="add-notes"),
 
     # Consultation-related paths
@@ -37,4 +37,8 @@ urlpatterns = [
 
     # Caregiver interview path
     path("schedule-caregiver-interview/<int:lead_id>/", schedule_caregiver_interview, name="schedule_caregiver_interview"),
+
+    # Client-related paths
+    path("clients/", clients, name="clients"),
+    path("mark-ready-to-service/<int:lead_id>/", mark_ready_to_service, name="mark_ready_to_service"),
 ]

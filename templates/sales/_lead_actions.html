@@ -9,14 +9,22 @@
         <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
         {% endif %}
 
+        <!-- Schedule Caregiver Interview -->
         {% if lead.stage == "Caregiver Interview Scheduled" %}
         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
             Schedule Caregiver Interview
         </button>
-    {% endif %}
+        {% endif %}
+
+        <!-- Move to Ready for Service -->
+        {% if next_stage == "Ready for Service" %}
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#start-service-modal">
+            {{ next_action_label }}
+        </button>
+        {% endif %}
 
         <!-- Next Action -->
-        {% if next_action_label and next_stage %}
+        {% if next_action_label and next_stage and next_stage != "Ready for Service" %}
         {% if next_stage == 'Consultation Scheduled' %}
         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
         {% else %}
