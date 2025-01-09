@@ -1,63 +1,68 @@
-<div class="modal fade" id="start-service-modal" tabindex="-1" role="dialog" aria-labelledby="start-service-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="start-service-modal-label">Start Service</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="POST" action="{% url 'mark_ready_to_service' lead.id %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <!-- Caregiver Field -->
-                    <div class="form-group">
-                        <label for="caregiver">Assign Caregiver</label>
-                        <select id="caregiver" name="caregiver_id" class="form-control" required>
-                            {% for caregiver in caregivers %}
-                                <option value="{{ caregiver.id }}" 
-                                    {% if lead.caregiver and caregiver.id == lead.caregiver.id %}selected{% endif %}>
-                                    {{ caregiver.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="start-date">Start Date</label>
-                        <input type="date" id="start-date" name="start_date" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="end-date">End Date</label>
-                        <input type="date" id="end-date" name="end_date" class="form-control">
-                        <small class="form-text text-muted">Leave empty for undetermined.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="days-per-week">Days Per Week</label>
-                        <input type="number" id="days-per-week" name="days_per_week" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="hours-per-day">Hours Per Day</label>
-                        <input type="number" id="hours-per-day" name="hours_per_day" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Price for Client</label>
-                        <input type="number" id="price" name="price" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="caregiver-salary">Caregiver Salary</label>
-                        <input type="number" id="caregiver-salary" name="caregiver_salary" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="additional-details">Additional Details</label>
-                        <textarea id="additional-details" name="additional_details" class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
+<div class="card-body">
+    {% if lead.stage == "Active Client" %}
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Caregiver -->
+        <div class="form-group">
+            <label for="caregiver">Caregiver Assigned</label>
+            <select id="caregiver" name="caregiver_id" class="form-control" required>
+                {% for caregiver in caregivers %}
+                    <option value="{{ caregiver.id }}" 
+                        {% if lead.caregiver and caregiver.id == lead.caregiver.id %}selected{% endif %}>
+                        {{ caregiver.name }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
-    </div>
+
+        <!-- Start Date -->
+        <div class="form-group">
+            <label for="start_date">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ lead.start_date|date:'Y-m-d' }}" required>
+        </div>
+        
+        <!-- End Date -->
+        <div class="form-group">
+            <label for="end_date">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ lead.end_date|date:'Y-m-d' }}">
+            <small class="form-text text-muted">Leave blank for undetermined.</small>
+        </div>
+        
+        <!-- Days Per Week -->
+        <div class="form-group">
+            <label for="days_per_week">Days per Week</label>
+            <input type="number" id="days_per_week" name="days_per_week" class="form-control" value="{{ lead.days_per_week }}" required>
+        </div>
+        
+        <!-- Hours Per Day -->
+        <div class="form-group">
+            <label for="hours_per_day">Hours per Day</label>
+            <input type="number" id="hours_per_day" name="hours_per_day" class="form-control" value="{{ lead.hours_per_day }}" required>
+        </div>
+        
+        <!-- Price -->
+        <div class="form-group">
+            <label for="price">Price for Client</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ lead.price }}" required>
+        </div>
+        
+        <!-- Caregiver Salary -->
+        <div class="form-group">
+            <label for="caregiver_salary">Caregiver Salary</label>
+            <input type="number" id="caregiver_salary" name="caregiver_salary" class="form-control" value="{{ lead.caregiver_salary }}" required>
+        </div>
+        
+        <!-- Additional Details -->
+        <div class="form-group">
+            <label for="additional_details">Additional Details</label>
+            <textarea id="additional_details" name="additional_details" class="form-control" rows="3">{{ lead.additional_details }}</textarea>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+    {% else %}
+        <p class="text-muted">No service details available.</p>
+    {% endif %}
 </div>

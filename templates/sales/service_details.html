@@ -1,8 +1,8 @@
 <div class="card-body">
     {% if lead.stage == "Active Client" %}
-    <form method="POST">
+    <form method="POST" action="{% url 'save_service_details' lead.id %}">
         {% csrf_token %}
-        
+
         <!-- Caregiver -->
         <div class="form-group">
             <label for="caregiver">Caregiver Assigned</label>
@@ -21,44 +21,53 @@
             <label for="start_date">Start Date</label>
             <input type="date" id="start_date" name="start_date" class="form-control" value="{{ lead.start_date|date:'Y-m-d' }}" required>
         </div>
-        
-        <!-- End Date -->
+
+        <!-- Service Type -->
         <div class="form-group">
+            <label for="service_type">Service Type</label>
+            <select id="service_type" name="service_type" class="form-control">
+                <option value="undetermined" {% if not lead.end_date %}selected{% endif %}>Undetermined</option>
+                <option value="short-term" {% if lead.end_date %}selected{% endif %}>Short Term</option>
+            </select>
+        </div>
+
+        <!-- End Date -->
+        <div class="form-group" id="end_date_group" {% if not lead.end_date %}style="display: none;"{% endif %}>
             <label for="end_date">End Date</label>
             <input type="date" id="end_date" name="end_date" class="form-control" value="{{ lead.end_date|date:'Y-m-d' }}">
-            <small class="form-text text-muted">Leave blank for undetermined.</small>
+            <small class="form-text text-muted">Ensure end date is after start date.</small>
         </div>
-        
+
         <!-- Days Per Week -->
         <div class="form-group">
             <label for="days_per_week">Days per Week</label>
             <input type="number" id="days_per_week" name="days_per_week" class="form-control" value="{{ lead.days_per_week }}" required>
         </div>
-        
+
         <!-- Hours Per Day -->
         <div class="form-group">
             <label for="hours_per_day">Hours per Day</label>
             <input type="number" id="hours_per_day" name="hours_per_day" class="form-control" value="{{ lead.hours_per_day }}" required>
         </div>
-        
+
         <!-- Price -->
         <div class="form-group">
             <label for="price">Price for Client</label>
             <input type="number" id="price" name="price" class="form-control" value="{{ lead.price }}" required>
         </div>
-        
+
         <!-- Caregiver Salary -->
         <div class="form-group">
             <label for="caregiver_salary">Caregiver Salary</label>
             <input type="number" id="caregiver_salary" name="caregiver_salary" class="form-control" value="{{ lead.caregiver_salary }}" required>
         </div>
-        
+
         <!-- Additional Details -->
         <div class="form-group">
             <label for="additional_details">Additional Details</label>
             <textarea id="additional_details" name="additional_details" class="form-control" rows="3">{{ lead.additional_details }}</textarea>
         </div>
-        
+
         <!-- Submit Button -->
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
@@ -66,3 +75,29 @@
         <p class="text-muted">No service details available.</p>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const serviceType = document.getElementById("service_type");
+        const endDateGroup = document.getElementById("end_date_group");
+        const endDateInput = document.getElementById("end_date");
+
+        // Function to update visibility of the End Date field
+        function updateEndDateVisibility() {
+            if (serviceType.value === "short-term") {
+                endDateGroup.style.display = "block";
+                endDateInput.required = true;
+            } else {
+                endDateGroup.style.display = "none";
+                endDateInput.required = false;
+                endDateInput.value = ""; // Clear the value if undetermined
+            }
+        }
+
+        // Initial visibility check
+        updateEndDateVisibility();
+
+        // Event listener for changes to the Service Type dropdown
+        serviceType.addEventListener("change", updateEndDateVisibility);
+    });
+</script>

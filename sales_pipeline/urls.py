@@ -11,8 +11,9 @@ from .views import (
     start_consultation_form, 
     save_consultation_form,
     schedule_caregiver_interview
+    
 )
-from .views.clients_views import clients, mark_ready_to_service  # Updated import
+from .views.clients_views import clients, mark_ready_to_service, save_service_details  # Updated import
 
 urlpatterns = [
     # Pipeline-related paths
@@ -41,4 +42,6 @@ urlpatterns = [
     # Client-related paths
     path("clients/", clients, name="clients"),
     path("mark-ready-to-service/<int:lead_id>/", mark_ready_to_service, name="mark_ready_to_service"),
+    path("save-service-details/<int:lead_id>/", save_service_details, name="save_service_details"),  # Added path
+
 ]

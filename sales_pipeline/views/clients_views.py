@@ -85,3 +85,28 @@ def archive_client(request, client_id):
         return redirect("clients")
 
     return redirect("client_profile", client_id=client.id)
+
+def save_service_details(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    
+    if request.method == "POST":
+        try:
+            lead.start_date = request.POST.get("start_date")
+            lead.end_date = request.POST.get("end_date") if request.POST.get("service_type") == "short-term" else None
+            lead.days_per_week = request.POST.get("days_per_week")
+            lead.hours_per_day = request.POST.get("hours_per_day")
+            lead.price = request.POST.get("price")
+            lead.caregiver_salary = request.POST.get("caregiver_salary")
+            lead.additional_details = request.POST.get("additional_details")
+            caregiver_id = request.POST.get("caregiver_id")
+            
+            if caregiver_id:
+                lead.caregiver_id = caregiver_id
+
+            lead.save()
+            return redirect("lead_profile", lead_id=lead.id)
+        except Exception as e:
+            print(f"Error updating service details: {e}")
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return render(request, "sales/service_details.html", {"lead": lead})

@@ -6,6 +6,7 @@ from .notes_views import add_notes
 from .consultation_views import update_lead_consultation, start_consultation_form, save_consultation_form
 from .caregiver_interview import schedule_caregiver_interview
 from .clients_views import clients, mark_ready_to_service  # Import the new views
+from .clients_views import save_service_details  # New import
 
 __all__ = [
     "sales_pipeline",
@@ -20,6 +21,7 @@ __all__ = [
     "start_consultation_form",
     "save_consultation_form",
     "schedule_caregiver_interview",
-    "clients",  # Add the new clients view
-    "mark_ready_to_service",  # Add the new mark_ready_to_service view
+    "clients",  
+    "mark_ready_to_service",  
+    "save_service_details", 
 ]
