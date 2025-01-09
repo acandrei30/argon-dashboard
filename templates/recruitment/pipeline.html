@@ -3,51 +3,59 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-  <!-- Header Section with Add Caregiver Button -->
-  <div class="row align-items-center py-4">
-    <div class="col-lg-6 col-7">
-      <h2 class="text-primary">Caregiver Pipeline</h2>
-    </div>
-    <div class="col-lg-6 col-5 text-right">
-      <!-- Add New Caregiver Button -->
-      <a href="{% url 'add_caregiver' %}" class="btn btn-sm btn-primary">
-        <i class="ni ni-fat-add"></i> Add New Caregiver
-      </a>
-    </div>
-  </div>
-
-  <!-- Pipeline Cards in Flex Row -->
-  <div class="d-flex flex-wrap justify-content-between">
-    {% for stage, caregivers in caregivers_by_stage.items %}
-      <div class="card flex-grow-1 mx-2" style="min-width: 250px; max-width: 300px;">
-        <div class="card-header">
-          <h5>{{ stages|dict_get:stage }}</h5>
-        </div>
-        <div class="card-body"
-             id="stage-{{ stage }}"
-             ondragover="allowDrop(event)"
-             ondrop="handleDrop(event, '{{ stage }}')">
-          {% for caregiver in caregivers %}
-            <div class="mb-3 caregiver-card"
-                 id="caregiver-{{ caregiver.id }}"
-                 draggable="true"
-                 ondragstart="handleDragStart(event, '{{ caregiver.id }}')">
-              <!-- Link to Caregiver's Profile -->
-              <a href="{% url 'caregiver_profile' caregiver.id %}">{{ caregiver.name }}</a>
-            </div>
-          {% empty %}
-            <p>No caregivers in this stage.</p>
-          {% endfor %}
-        </div>
+<!-- Header Section -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+      <div class="header-body">
+          <div class="row align-items-center py-4">
+              <div class="col-lg-6 col-7">
+                  <h6 class="h2 text-white d-inline-block mb-0">Recruitment Pipeline</h6>
+              </div>
+              <div class="col-lg-6 col-5 text-right">
+                  <a href="{% url 'add_caregiver' %}" class="btn btn-sm btn-neutral">
+                      <i class="ni ni-fat-add"></i> Add New Caregiver
+                  </a>
+              </div>
+          </div>
       </div>
-    {% endfor %}
   </div>
 </div>
 
-
+<!-- Page content -->
+<div class="container-fluid mt--6">
+    <!-- Recruitment Pipeline Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table align-items-center table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        {% for stage_name in stages.values %}
+                            <th class="text-center">{{ stage_name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for stage, stage_name in stages.items %}
+                            <td class="align-top">
+                                {% for caregiver in caregivers_by_stage|dict_get:stage %}
+                                    <div class="py-2 d-flex flex-column border-bottom">
+                                        <!-- Caregiver Name -->
+                                        <a href="{% url 'caregiver_profile' caregiver.id %}" class="d-block text-dark font-weight-bold" style="font-size: 1.1rem;">
+                                            {{ caregiver.name }}
+                                        </a>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center text-muted py-4">
+                                        No caregivers
+                                    </div>
+                                {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock content %}
-
-{% block javascripts %}
-<script src="{% static 'assets/js/pipeline.js' %}" defer></script>
-{% endblock javascripts %}
