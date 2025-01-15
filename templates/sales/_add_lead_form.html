@@ -8,13 +8,14 @@
     <div class="text-right">
         <!-- Ready for Consultation Button -->
         <button
-            type="submit"
-            class="btn btn-primary"
-            id="btnReadyForConsultation"
-            data-status="ready_for_consultation"
-        >
-            Ready for Consultation
-        </button>
+        type="button"
+        class="btn btn-primary"
+        id="btnReadyForConsultation"
+        data-status="ready_for_consultation"
+    >
+        Ready for Consultation
+    </button>
+    
 
         <!-- Not Ready for Consultation Button -->
         <button
@@ -27,6 +28,54 @@
         </button>
     </div>
 </form>
+
+
+<!-- Modal for Consultation Options -->
+<div class="modal fade" id="consultation-modal" tabindex="-1" aria-labelledby="consultation-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="consultation-modal-label">Next Steps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Would you like to:</p>
+                <div class="d-flex justify-content-around">
+                    <a href="" id="do-consultation-now" class="btn btn-primary">Do Consultation Now</a>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#calendar-modal">
+                        Schedule Consultation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Scheduling Consultation -->
+<div class="modal fade" id="calendar-modal" tabindex="-1" aria-labelledby="calendar-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendar-modal-label">Schedule Consultation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="schedule-consultation-form">
+                    <div class="mb-3">
+                        <label for="consultation-date" class="form-label">Date</label>
+                        <input type="date" id="consultation-date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="consultation-time" class="form-label">Time</label>
+                        <input type="time" id="consultation-time" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Not Ready for Consultation Modal -->
 <div class="modal fade" id="notReadyForConsultationModal" tabindex="-1" role="dialog" aria-labelledby="notReadyForConsultationModalLabel" aria-hidden="true">
@@ -71,3 +120,5 @@
         </div>
     </div>
 </div>
+
+

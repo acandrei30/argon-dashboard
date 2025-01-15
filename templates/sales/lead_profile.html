@@ -55,12 +55,14 @@
                     <h4>Consultation Details</h4>
                 </div>
                 <div class="card-body">
-                    {% if not lead.consultation_datetime %}
+                    {% if not lead.consultation_datetime and not lead.consultation %}
                         <p class="text-muted">Consultation not done</p>
-                    {% elif not lead.consultation %}
+                    {% elif lead.consultation %}
+                        {% include 'sales/_lead_consultation.html' %}
+                    {% elif lead.consultation_datetime %}
                         <p class="text-muted">Consultation scheduled on {{ lead.consultation_datetime|date:"Y-m-d H:i" }}</p>
                     {% else %}
-                        {% include 'sales/_lead_consultation.html' %}
+                        <p class="text-muted">No consultation data available</p>
                     {% endif %}
                 </div>
             </div>

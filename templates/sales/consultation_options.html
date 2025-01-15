@@ -1,0 +1,21 @@
+{% extends "layouts/base.html" %}
+{% block title %} Consultation Options {% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-primary">Consultation Options</h2>
+    <p>What would you like to do for this consultation?</p>
+    <div class="d-flex justify-content-around">
+        <!-- Option 1: Do It Now -->
+        <a href="{% url 'start-consultation-form' lead_id %}" class="btn btn-primary">Do it Now</a>
+
+        <!-- Option 2: Schedule for Later -->
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#consultation-modal">
+            Schedule for Later
+        </button>
+    </div>
+</div>
+
+<!-- Include the consultation modal -->
+{% include 'sales/consultation_modal.html' %}
+{% endblock content %}

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('leadForm');
     const hiddenStatusField = document.getElementById('lead_status');
     const saveNotReadyButton = document.getElementById('saveNotReadyForConsultation');
+    let isSubmitting = false; // Flag to prevent multiple submissions
 
     // Initialize Flatpickr for manual date selection
     if (typeof flatpickr !== 'undefined') {
@@ -15,37 +16,26 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('Flatpickr is not defined. Ensure the library is loaded.');
     }
 
-    // Function to check if all form fields are filled
-    function areFormFieldsComplete(form) {
-        const requiredFields = form.querySelectorAll('[required]');
-        for (const field of requiredFields) {
-            if (!field.value.trim()) {
-                field.focus(); // Focus on the first incomplete field
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Handle Not Ready for Consultation Button Click
-    notReadyButton.addEventListener('click', function () {
-        // Check if all form fields are completed
-        if (!areFormFieldsComplete(form)) {
-            alert('Please fill out all required fields in the form before proceeding.');
-            return;
-        }
-
+    // Prevent default form submission when opening the modal
+    notReadyButton.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent form submission
         // Update the hidden field for the status
         hiddenStatusField.value = this.dataset.status;
-
         // Open the Not Ready for Consultation modal
         notReadyModal.show();
     });
 
-    // Save Not Ready for Consultation Data
-    saveNotReadyButton.addEventListener('click', function () {
+    // Save "Not Ready for Consultation" Data
+    saveNotReadyButton.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent default button action
+
+        if (isSubmitting) {
+            console.log('Form is already being submitted...');
+            return; // Prevent further action if the form is already being submitted
+        }
+
         const reason = document.getElementById('reason').value;
-        const followUpDays = document.querySelector('input[name="follow_up"]:checked')?.value;
+        const followUpDays = document.querySelector('input[name="follow_up_days"]:checked')?.value;
         const manualFollowUpDate = document.getElementById('manualFollowUpDate')?.value;
 
         // Validate that either follow-up days or manual follow-up date is provided
@@ -66,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
             today.setDate(today.getDate() + parseInt(followUpDays));
             followUpDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
         }
+
+        // Mark the form as being submitted
+        isSubmitting = true;
 
         // Submit the form via AJAX
         const formData = new FormData(form);
@@ -88,9 +81,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     return response.json().then(data => {
                         alert('Error saving lead: ' + (data.message || 'Unknown error'));
+                        isSubmitting = false; // Reset the flag on error
                     });
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                isSubmitting = false; // Reset the flag on error
+            });
     });
 });

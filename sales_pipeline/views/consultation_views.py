@@ -43,9 +43,10 @@ def start_consultation_form(request, lead_id):
 
 def save_consultation_form(request, lead_id):
     if request.method == "POST":
+        # Fetch the lead
         lead = get_object_or_404(Lead, id=lead_id)
 
-        # Create or update the consultation data
+        # Create or update consultation for the lead
         consultation, created = Consultation.objects.get_or_create(lead=lead)
         consultation.alertness = request.POST.get("alertness")
         consultation.lives_alone = request.POST.get("lives_alone")
@@ -61,13 +62,19 @@ def save_consultation_form(request, lead_id):
         consultation.hospitalization_reason = request.POST.get("hospitalization_reason")
         consultation.save()
 
+        # Update lead stage to "Under Consideration"
+        lead.stage = SalesPipelineStage.UNDER_CONSIDERATION
+        lead.save()
+
         # Add a note to the action trail
         LeadNotes.objects.create(
             lead=lead,
-            notes="Consultation completed",
+            notes="Consultation completed and moved to Under Consideration",
             created_at=now()
         )
 
+        # Redirect back to lead profile
         return redirect("lead_profile", lead_id=lead.id)
 
+    # Redirect to lead profile if not a POST request
     return redirect("lead_profile", lead_id=lead_id)

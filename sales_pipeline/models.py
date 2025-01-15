@@ -17,7 +17,7 @@ class Lead(models.Model):
     # Existing fields
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
-    email = models.EmailField()
+    email = models.EmailField(blank=True, null=True)
     reason = models.TextField(null=True, blank=True)
     follow_up = models.CharField(max_length=20, null=True, blank=True)
     location = models.CharField(max_length=255, default="Unknown")
