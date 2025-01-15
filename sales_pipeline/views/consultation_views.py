@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from sales_pipeline.models import Lead, SalesPipelineStage
 from sales_pipeline.models import Lead, Consultation, LeadNotes 
 from django.utils.timezone import now
+import json
+from django.utils.timezone import make_aware
+from datetime import datetime
 
 def update_lead_consultation(request, lead_id):
     """
@@ -12,16 +15,24 @@ def update_lead_consultation(request, lead_id):
 
     if request.method == "POST":
         try:
-            # Fetch consultation datetime from the request
-            consultation_datetime = request.POST.get('consultation_datetime')
+            # Parse JSON body
+            data = json.loads(request.body)
+            consultation_datetime = data.get('consultation_datetime')
 
-            # Debug: Print the received datetime
+            # Debugging logs
             print("Received consultation_datetime:", consultation_datetime)
 
             if not consultation_datetime:
                 return JsonResponse({"error": "Consultation datetime is required."}, status=400)
 
-            # Update the lead's consultation datetime and stage
+            # Parse and validate datetime
+            try:
+                parsed_datetime = datetime.strptime(consultation_datetime, "%Y-%m-%dT%H:%M:%S")
+                consultation_datetime = make_aware(parsed_datetime)
+            except ValueError as e:
+                return JsonResponse({"error": "Invalid datetime format. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS)."}, status=400)
+
+            # Update lead details
             lead.consultation_datetime = consultation_datetime
             lead.stage = SalesPipelineStage.CONSULTATION_SCHEDULED
             lead.save()
