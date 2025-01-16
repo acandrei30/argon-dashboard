@@ -1,23 +1,26 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from sales_pipeline.models import Lead, SalesPipelineStage
-from sales_pipeline.models import Lead, Consultation, LeadNotes 
-from django.utils.timezone import now
-import json
-from django.utils.timezone import make_aware
+from sales_pipeline.models import Lead, SalesPipelineStage, LeadNotes
+from django.utils.timezone import make_aware, now
 from datetime import datetime
+import json
 
 def update_lead_consultation(request, lead_id):
     """
     Updates the consultation datetime for a lead and moves it to the 'Consultation Scheduled' stage.
+    Adds the update directly to the timeline.
     """
     lead = get_object_or_404(Lead, id=lead_id)
 
     if request.method == "POST":
         try:
-            # Parse JSON body
-            data = json.loads(request.body)
-            consultation_datetime = data.get('consultation_datetime')
+            # Handle both JSON payloads and form data
+            consultation_datetime = None
+            if request.headers.get("Content-Type") == "application/json":
+                data = json.loads(request.body)
+                consultation_datetime = data.get("consultation_datetime")
+            else:
+                consultation_datetime = request.POST.get("consultation_datetime")
 
             # Debugging logs
             print("Received consultation_datetime:", consultation_datetime)
@@ -27,10 +30,13 @@ def update_lead_consultation(request, lead_id):
 
             # Parse and validate datetime
             try:
-                parsed_datetime = datetime.strptime(consultation_datetime, "%Y-%m-%dT%H:%M:%S")
+                if "T" in consultation_datetime:  # JSON format (ISO 8601)
+                    parsed_datetime = datetime.strptime(consultation_datetime, "%Y-%m-%dT%H:%M:%S")
+                else:  # Form format (e.g., "YYYY-MM-DD HH:MM")
+                    parsed_datetime = datetime.strptime(consultation_datetime, "%Y-%m-%d %H:%M")
                 consultation_datetime = make_aware(parsed_datetime)
-            except ValueError as e:
-                return JsonResponse({"error": "Invalid datetime format. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS)."}, status=400)
+            except ValueError:
+                return JsonResponse({"error": "Invalid datetime format. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS) or YYYY-MM-DD HH:MM."}, status=400)
 
             # Update lead details
             lead.consultation_datetime = consultation_datetime
@@ -54,10 +60,9 @@ def start_consultation_form(request, lead_id):
 
 def save_consultation_form(request, lead_id):
     if request.method == "POST":
-        # Fetch the lead
         lead = get_object_or_404(Lead, id=lead_id)
 
-        # Create or update consultation for the lead
+        # Create or update the consultation data
         consultation, created = Consultation.objects.get_or_create(lead=lead)
         consultation.alertness = request.POST.get("alertness")
         consultation.lives_alone = request.POST.get("lives_alone")
@@ -73,19 +78,13 @@ def save_consultation_form(request, lead_id):
         consultation.hospitalization_reason = request.POST.get("hospitalization_reason")
         consultation.save()
 
-        # Update lead stage to "Under Consideration"
-        lead.stage = SalesPipelineStage.UNDER_CONSIDERATION
-        lead.save()
-
         # Add a note to the action trail
         LeadNotes.objects.create(
             lead=lead,
-            notes="Consultation completed and moved to Under Consideration",
+            notes="Consultation completed",
             created_at=now()
         )
 
-        # Redirect back to lead profile
         return redirect("lead_profile", lead_id=lead.id)
 
-    # Redirect to lead profile if not a POST request
     return redirect("lead_profile", lead_id=lead_id)

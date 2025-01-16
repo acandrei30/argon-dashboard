@@ -16,7 +16,7 @@
             resize: none;
             width: 100%;
             border: none;
-            padding: 10px 50px 10px 35px; /* Adjust padding to avoid overlap with the icon */
+            padding: 10px;
             border-radius: 10px;
             background-color: transparent;
             outline: none;
@@ -27,7 +27,7 @@
         /* Attachment icon styling */
         .attachment-icon {
             position: absolute;
-            left: 10px; /* Keep the icon closer to the left edge */
+            left: 10px;
             font-size: 18px;
             color: #5e72e4;
             cursor: pointer;
@@ -41,10 +41,10 @@
         /* Send button styling */
         .send-button {
             position: absolute;
-            right: 10px; /* Position to the far right */
+            right: 10px;
             background-color: #5e72e4;
             border: none;
-            border-radius: 50%; /* Fully rounded */
+            border-radius: 50%;
             width: 35px;
             height: 35px;
             display: flex;
@@ -93,9 +93,9 @@
                 {% for entry in timeline %}
                 <div class="timeline-block" style="margin-bottom: 20px;"> <!-- Added margin for spacing -->
                     <span class="timeline-step 
-                        {% if entry.type == 'Note' %}badge-success{% elif entry.type == 'Consultation' %}badge-primary{% elif entry.type == 'Follow-Up' %}badge-warning{% endif %}">
+                        {% if entry.type == 'Note' %}badge-success{% elif entry.type == 'Consultation Scheduled' %}badge-primary{% elif entry.type == 'Follow-Up' %}badge-warning{% endif %}">
                         <i class="ni 
-                            {% if entry.type == 'Note' %}ni-single-copy-04{% elif entry.type == 'Consultation' %}ni-calendar-grid-58{% elif entry.type == 'Follow-Up' %}ni-send{% endif %}">
+                            {% if entry.type == 'Note' %}ni-single-copy-04{% elif entry.type == 'Consultation Scheduled' %}ni-calendar-grid-58{% elif entry.type == 'Follow-Up' %}ni-send{% endif %}">
                         </i>
                     </span>
                     <div class="timeline-content">
@@ -104,21 +104,21 @@
                                 <span class="text-muted text-sm font-weight-bold">
                                     {% if entry.type == 'Note' %}
                                         Note Added
-                                    {% elif entry.type == 'Consultation' %}
-                                        Consultation scheduled for
-                                        <br><strong>{{ entry.scheduled_date|date:"Y-m-d H:i" }}</strong> <!-- Date on a new line -->
+                                    {% elif entry.type == 'Consultation Scheduled' %}
+                                        {{ entry.details }} <!-- Render details for consultation -->
+                                       
                                     {% elif entry.type == 'Follow-Up' %}
                                         Follow-up scheduled for
-                                        <br><strong>{{ entry.scheduled_date|date:"Y-m-d" }}</strong> <!-- Date on a new line -->
+                                        <br><strong>{{ entry.scheduled_date|date:"Y-m-d" }}</strong>
                                     {% endif %}
                                 </span>
                             </div>
                             <div class="text-right">
-                                <small class="text-muted">{{ entry.created_at|date:"Y-m-d H:i" }}</small> <!-- Shortened date display -->
+                                <small class="text-muted">{{ entry.created_at|date:"Y-m-d H:i" }}</small>
                             </div>
                         </div>
                         {% if entry.type == 'Note' %}
-                        <div style="background-color: #FFFACD; padding: 10px; border-radius: 5px; width: 100%; margin-top: 5px;"> <!-- Improved note styling -->
+                        <div style="background-color: #FFFACD; padding: 10px; border-radius: 5px; width: 100%; margin-top: 5px;">
                             <h6 class="text-sm mt-1 mb-0">{{ entry.details }}</h6>
                         </div>
                         {% if entry.file %}

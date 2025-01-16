@@ -14,9 +14,10 @@
     <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
             <h1 class="text-primary d-inline">{{ lead.name }}</h1>
+            <span class="badge badge-info">{{ lead.stage }}</span>
         </div>
         <div class="col-lg-6 col-5 text-right">
-            <span class="badge badge-info">{{ lead.stage }}</span>
+
             <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
                 <i class="ni ni-bold-left"></i> Back to Pipeline
             </a>

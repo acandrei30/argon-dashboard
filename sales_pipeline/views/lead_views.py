@@ -149,6 +149,16 @@ def lead_profile(request, lead_id):
             "details": " | ".join(consultation_data),
         })
 
+    # Add consultation scheduling to the timeline
+    if lead.consultation_datetime:
+        consultation_creation_time = lead.consultation_creation_time or now()
+        timeline.append({
+            "type": "Consultation Scheduled",
+            "created_at": normalize_datetime(consultation_creation_time),
+            "details": f"Consultation scheduled for {lead.consultation_datetime.strftime('%Y-%m-%d %H:%M')}",
+            "scheduled_date": normalize_datetime(lead.consultation_datetime),
+        })
+
     # Add follow-up to the timeline
     if lead.follow_up_date:
         follow_up_creation_time = lead.follow_up_creation_time or now()
