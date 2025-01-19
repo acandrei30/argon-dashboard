@@ -10,13 +10,7 @@
             <form method="POST" action="{% url 'schedule_caregiver_interview' lead.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <!-- Debugging Caregivers -->
-                    <p>Total caregivers: {{ caregivers|length }}</p>
-                    <ul>
-                        {% for caregiver in caregivers %}
-                            <li>{{ caregiver.name }} ({{ caregiver.stage }})</li>
-                        {% endfor %}
-                    </ul>
+                 
                     <div class="form-group">
                         <label for="caregiver">Select Caregiver</label>
                         <select id="caregiver" name="caregiver_id" class="form-control" required>

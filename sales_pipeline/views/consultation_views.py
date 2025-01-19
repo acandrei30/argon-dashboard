@@ -78,13 +78,18 @@ def save_consultation_form(request, lead_id):
         consultation.hospitalization_reason = request.POST.get("hospitalization_reason")
         consultation.save()
 
+        # Update the lead stage to "Under Consideration"
+        lead.stage = SalesPipelineStage.UNDER_CONSIDERATION
+        lead.save()
+
         # Add a note to the action trail
         LeadNotes.objects.create(
             lead=lead,
-            notes="Consultation completed",
+            notes="Consultation completed and moved to Under Consideration",  # Ensure this is set
             created_at=now()
         )
 
         return redirect("lead_profile", lead_id=lead.id)
 
     return redirect("lead_profile", lead_id=lead_id)
+

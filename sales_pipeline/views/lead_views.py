@@ -7,7 +7,6 @@ from django.utils.timezone import now
 from recruitment.models import Caregiver, PipelineStage  # Import Caregiver model
 from django.db.models import Q
 from django.db import transaction, IntegrityError
-
 from django.db import transaction, IntegrityError
 from datetime import datetime
 from django.http import JsonResponse
@@ -143,11 +142,7 @@ def lead_profile(request, lead_id):
             f"Recent Hospitalization: {consultation.recent_hospitalization}",
             f"Hospitalization Reason: {consultation.hospitalization_reason or 'None'}",
         ]
-        timeline.append({
-            "type": "Consultation",
-            "created_at": now(),
-            "details": " | ".join(consultation_data),
-        })
+
 
     # Add consultation scheduling to the timeline
     if lead.consultation_datetime:
@@ -158,6 +153,8 @@ def lead_profile(request, lead_id):
             "details": f"Consultation scheduled for {lead.consultation_datetime.strftime('%Y-%m-%d %H:%M')}",
             "scheduled_date": normalize_datetime(lead.consultation_datetime),
         })
+
+  
 
     # Add follow-up to the timeline
     if lead.follow_up_date:
@@ -179,7 +176,7 @@ def lead_profile(request, lead_id):
         SalesPipelineStage.UNDER_CONSIDERATION,
         SalesPipelineStage.CAREGIVER_INTERVIEW_SCHEDULED,
         SalesPipelineStage.CAREGIVER_CONSIDERATION,
-        SalesPipelineStage.READY_FOR_SERVICE,
+ 
     ]
 
     # Get the current stage index and determine next/previous stages

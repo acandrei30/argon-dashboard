@@ -1,12 +1,14 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.timezone import make_aware
 from datetime import datetime
+from django.http import JsonResponse
 from recruitment.models import Caregiver
-from sales_pipeline.models import Lead, LeadNotes, SalesPipelineStage
+from sales_pipeline.models import Lead, LeadNotes
 
 def schedule_caregiver_interview(request, lead_id):
     """
-    Schedule an interview for a caregiver and redirect back to the lead profile page.
+    Schedule an interview for a caregiver, update the lead's stage to 'Caregiver Interview Scheduled',
+    and allow scheduling multiple interviews.
     """
     lead = get_object_or_404(Lead, id=lead_id)
 
@@ -23,12 +25,16 @@ def schedule_caregiver_interview(request, lead_id):
             interview_datetime = make_aware(datetime.strptime(f"{interview_date} {interview_time}", "%Y-%m-%d %H:%M"))
 
             # Update the lead's interview details
-            lead.caregiver_interview_date = interview_datetime
+            lead.caregiver_interview_date = interview_datetime  # Update the most recent interview date
             lead.caregiver_interview_with = caregiver
-            lead.stage = SalesPipelineStage.CAREGIVER_INTERVIEW_SCHEDULED
+
+            # Update the lead's stage only if it's not already "Caregiver Interview Scheduled"
+            if lead.stage != "Caregiver Interview Scheduled":
+                lead.stage = "Caregiver Interview Scheduled"
+
             lead.save()
 
-            # Add a note to the lead's action trail
+            # Log the interview scheduling in the lead's action trail
             LeadNotes.objects.create(
                 lead=lead,
                 notes=f"Caregiver interview scheduled with {caregiver.name} on {interview_datetime.strftime('%Y-%m-%d %H:%M')}."

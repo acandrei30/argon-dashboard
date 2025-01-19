@@ -9,8 +9,7 @@ def sales_pipeline(request):
         SalesPipelineStage.CONSULTATION_SCHEDULED: "Consultation Scheduled",
         SalesPipelineStage.UNDER_CONSIDERATION: "Under Consideration",
         SalesPipelineStage.CAREGIVER_INTERVIEW_SCHEDULED: "Interview Scheduled",
-        SalesPipelineStage.CAREGIVER_CONSIDERATION: "Caregiver Consideration",
-        SalesPipelineStage.READY_FOR_SERVICE: "Ready for Service",
+        SalesPipelineStage.CAREGIVER_CONSIDERATION: "Caregiver Consideration",  
     }
 
     # Fetch leads grouped by stage

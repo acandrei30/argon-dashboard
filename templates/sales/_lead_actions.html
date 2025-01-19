@@ -1,4 +1,3 @@
-<!-- Actions Dropdown -->
 <div class="btn-group">
     <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Actions
@@ -10,29 +9,40 @@
         {% endif %}
 
         <!-- Schedule Caregiver Interview -->
-        {% if lead.stage == "Caregiver Interview Scheduled" %}
+        {% if lead.stage == "Under Consideration" %}
         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
             Schedule Caregiver Interview
         </button>
         {% endif %}
 
-        <!-- Move to Ready for Service -->
-        {% if next_stage == "Ready for Service" %}
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#start-service-modal">
-            {{ next_action_label }}
+        <!-- Schedule Another Caregiver Interview -->
+        {% if lead.stage == "Caregiver Interview Scheduled" %}
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
+            Schedule Another Caregiver Interview
         </button>
         {% endif %}
 
-        <!-- Next Action -->
-        {% if next_action_label and next_stage and next_stage != "Ready for Service" %}
-        {% if next_stage == 'Consultation Scheduled' %}
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#calendar-modal">{{ next_action_label }}</button>
-        {% else %}
+        <!-- Move to Active Client -->
+        {% if lead.stage == "Caregiver Consideration" %}
+        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#start-service-modal">
+            Move to Active Client
+        </button>
+        {% endif %}
+
+        <!-- Render Next Action -->
+        {% if next_action_label and next_stage and next_stage != "Caregiver Interview Scheduled" %}
         <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
             {% csrf_token %}
             <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
         </form>
         {% endif %}
+
+        <!-- Move to Under Consideration -->
+        {% if lead.stage == "New Lead" %}
+        <form method="POST" action="{% url 'update-stage' lead.id 'Under Consideration' %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">Move to Under Consideration</button>
+        </form>
         {% endif %}
 
         <!-- Previous Stage -->

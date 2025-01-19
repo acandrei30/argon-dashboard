@@ -10,34 +10,56 @@
             <form method="POST" action="{% url 'mark_ready_to_service' lead.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
+                    <!-- Start Date -->
                     <div class="form-group">
-                        <label for="start-date">Start Date</label>
-                        <input type="date" id="start-date" name="start_date" class="form-control" required>
+                        <label for="modal-start-date">Start Date</label>
+                        <input type="date" id="modal-start-date" name="start_date" class="form-control" required>
                     </div>
+
+                    <!-- Service Type -->
                     <div class="form-group">
-                        <label for="end-date">End Date</label>
-                        <input type="date" id="end-date" name="end_date" class="form-control">
-                        <small class="form-text text-muted">Leave empty for undetermined.</small>
+                        <label for="modal-service-type">Service Type</label>
+                        <select id="modal-service-type" name="service_type" class="form-control" required>
+                            <option value="undetermined" selected>Undetermined</option>
+                            <option value="short-term">Short Term</option>
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label for="days-per-week">Days Per Week</label>
-                        <input type="number" id="days-per-week" name="days_per_week" class="form-control" required>
+
+                    <!-- End Date -->
+                    <div class="form-group" id="modal-end-date-group" style="display: none;">
+                        <label for="modal-end-date">End Date</label>
+                        <input type="date" id="modal-end-date" name="end_date" class="form-control">
+                        <small class="form-text text-muted">Ensure end date is after start date.</small>
                     </div>
+
+                    <!-- Days Per Week -->
                     <div class="form-group">
-                        <label for="hours-per-day">Hours Per Day</label>
-                        <input type="number" id="hours-per-day" name="hours_per_day" class="form-control" required>
+                        <label for="modal-days-per-week">Days Per Week</label>
+                        <input type="number" id="modal-days-per-week" name="days_per_week" class="form-control" required>
                     </div>
+
+                    <!-- Hours Per Day -->
                     <div class="form-group">
-                        <label for="price">Price for Client</label>
-                        <input type="number" id="price" name="price" class="form-control" required>
+                        <label for="modal-hours-per-day">Hours Per Day</label>
+                        <input type="number" id="modal-hours-per-day" name="hours_per_day" class="form-control" required>
                     </div>
+
+                    <!-- Price -->
                     <div class="form-group">
-                        <label for="caregiver-salary">Caregiver Salary</label>
-                        <input type="number" id="caregiver-salary" name="caregiver_salary" class="form-control" required>
+                        <label for="modal-price">Price for Client</label>
+                        <input type="number" id="modal-price" name="price" class="form-control" required>
                     </div>
+
+                    <!-- Caregiver Salary -->
                     <div class="form-group">
-                        <label for="additional-details">Additional Details</label>
-                        <textarea id="additional-details" name="additional_details" class="form-control"></textarea>
+                        <label for="modal-caregiver-salary">Caregiver Salary</label>
+                        <input type="number" id="modal-caregiver-salary" name="caregiver_salary" class="form-control" required>
+                    </div>
+
+                    <!-- Additional Details -->
+                    <div class="form-group">
+                        <label for="modal-additional-details">Additional Details</label>
+                        <textarea id="modal-additional-details" name="additional_details" class="form-control"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -48,3 +70,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('#start-service-modal').on('shown.bs.modal', function () {
+            const modalServiceType = document.getElementById("modal-service-type");
+            const modalEndDateGroup = document.getElementById("modal-end-date-group");
+            const modalEndDateInput = document.getElementById("modal-end-date");
+
+            // Function to update visibility of the End Date field in the modal
+            function updateModalEndDateVisibility() {
+                if (modalServiceType.value === "short-term") {
+                    modalEndDateGroup.style.display = "block";
+                    modalEndDateInput.required = true;
+                    modalEndDateInput.disabled = false;
+                } else {
+                    modalEndDateGroup.style.display = "none";
+                    modalEndDateInput.required = false;
+                    modalEndDateInput.disabled = true;
+                    modalEndDateInput.value = "";
+                }
+            }
+
+            // Initial visibility check
+            updateModalEndDateVisibility();
+
+            // Event listener for changes to the Service Type dropdown
+            modalServiceType.addEventListener("change", updateModalEndDateVisibility);
+        });
+    });
+</script>

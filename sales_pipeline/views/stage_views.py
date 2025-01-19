@@ -33,7 +33,7 @@ def move_backward_stage(request, lead_id):
         SalesPipelineStage.UNDER_CONSIDERATION,
         SalesPipelineStage.CAREGIVER_INTERVIEW_SCHEDULED,
         SalesPipelineStage.CAREGIVER_CONSIDERATION,
-        SalesPipelineStage.READY_FOR_SERVICE,
+
     ]
 
     try:

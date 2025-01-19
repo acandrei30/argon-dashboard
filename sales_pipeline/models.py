@@ -8,7 +8,6 @@ class SalesPipelineStage(models.TextChoices):
     UNDER_CONSIDERATION = 'Under Consideration', 'Under Consideration'
     CAREGIVER_INTERVIEW_SCHEDULED = 'Caregiver Interview Scheduled', 'Caregiver Interview Scheduled'
     CAREGIVER_CONSIDERATION = 'Caregiver Consideration', 'Caregiver Consideration'
-    READY_FOR_SERVICE = 'Ready for Service', 'Ready for Service'
     ACTIVE_CLIENT = 'Active Client', 'Active Client'
 
 from django.db import models
