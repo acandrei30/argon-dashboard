@@ -1,30 +1,50 @@
 {% extends "layouts/base.html" %}
-
 {% block title %} Caregiver Profile {% endblock title %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="row align-items-center py-4">
-      <div class="col-lg-6 col-7">
-        <h1 class="text-primary d-inline">{{ caregiver.name }}</h1>
-    </div>
-    
-        <div class="col-lg-6 col-5 text-right">
-            <!-- Back to Pipeline Button -->
-            <a href="{% url 'caregiver-pipeline' %}" class="btn btn-sm btn-primary">
-                <i class="ni ni-bold-left"></i> Back to Pipeline
-            </a>
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h1 class="text-white d-inline">{{ caregiver.name }}</h1>
+                    <span class="badge badge-info">{{ caregiver.stage }}</span>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="{% url 'caregiver-pipeline' %}" class="btn btn-sm btn-neutral">
+                        <i class="ni ni-bold-left"></i> Back to Pipeline
+                    </a>
+                    <!-- Actions Dropdown -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Actions
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% if next_action_label and next_stage %}
+                            <form method="POST" action="{% url 'caregiver-update-stage' caregiver.id next_stage %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">Archive Caregiver</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Main Content -->
+<div class="container-fluid mt--6">
     <div class="row">
-        <!-- Caregiver Details Form -->
-        <div class="col-xl-8">
+        <!-- First Column: Caregiver Details -->
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0">Edit Caregiver Details</h3>
+                    <h4>Caregiver Details</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST">
@@ -39,11 +59,19 @@
                         </div>
                         <div class="form-group">
                             <label for="experience">Experience</label>
-                            <input type="text" id="experience" name="experience" class="form-control" value="{{ caregiver.experience }}" required>
+                            <input type="number" id="experience" name="experience" class="form-control" value="{{ caregiver.experience }}" required>
                         </div>
                         <div class="form-group">
                             <label for="salary_expectation">Salary Expectation</label>
                             <input type="text" id="salary_expectation" name="salary_expectation" class="form-control" value="{{ caregiver.salary_expectation }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" value="{{ caregiver.email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" class="form-control" value="{{ caregiver.phone }}" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
@@ -51,95 +79,218 @@
             </div>
         </div>
 
-        <!-- Sidebar for Actions -->
-        <div class="col-xl-4">
-            <!-- Current Stage -->
+        <!-- Second Column: Professional Info -->
+        <div class="col-md-4">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Current Stage</h4>
-                    <span class="badge badge-info">{{ caregiver.stage }}</span>
-                </div>
-            </div>
-
-            <div class="card mt-4">
                 <div class="card-header">
-                    <h4>Actions</h4>
+                    <h4>Professional Info</h4>
                 </div>
                 <div class="card-body">
-                    <!-- Action Button to move stages -->
-                    {% if next_action_label and next_stage %}
-                    <form method="POST" action="{% url 'caregiver-update-stage' caregiver.id next_stage %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success">{{ next_action_label }}</button>
-                    </form>
-                    {% endif %}
-        
-                    <!-- Dropdown for Other Actions -->
-                    <div class="dropdown d-inline-block ml-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="otherActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Other
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="otherActionsDropdown">
-                            {% if previous_stage %}
-                            <form method="POST" action="{% url 'update-stage' caregiver.id previous_stage %}">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
-                            </form>
-                            {% endif %}
-                            <form method="POST" action="{% url 'archive-caregiver' caregiver.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item text-danger">Archive Caregiver</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Notes Section -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4>Notes and Files</h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" action="{% url 'add-notes' caregiver.id %}">
+                    <form method="POST">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="notes">Notes</label>
-                            <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Enter notes for this caregiver"></textarea>
+                            <label for="professional_training">Professional Training</label>
+                            <select id="professional_training" name="professional_training" class="form-control">
+                                <option value="True" {% if caregiver.professional_training %}selected{% endif %}>Yes</option>
+                                <option value="False" {% if not caregiver.professional_training %}selected{% endif %}>No</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label for="files">Attach Files</label>
-                            <input type="file" name="files" class="form-control">
+                            <label for="house_services">House Services</label>
+                            <textarea id="house_services" name="house_services" class="form-control">{{ caregiver.house_services }}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-info">Save Notes</button>
+                        <div class="form-group">
+                            <label for="mental_health_acceptance">Mental Health Acceptance</label>
+                            <select id="mental_health_acceptance" name="mental_health_acceptance" class="form-control">
+                                <option value="True" {% if caregiver.mental_health_acceptance %}selected{% endif %}>Yes</option>
+                                <option value="False" {% if not caregiver.mental_health_acceptance %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="location_preference">Location Preference</label>
+                            <textarea id="location_preference" name="location_preference" class="form-control">{{ caregiver.location_preference }}</textarea>
+                        </div>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Notes Section -->
-            <div class="card mt-4">
+        <!-- Third Column: Notes -->
+        <div class="col-md-4">
+            <div class="card">
                 <div class="card-header">
                     <h4>Notes</h4>
                 </div>
                 <div class="card-body">
-                    {% if notes %}
-                        <ul class="list-group">
+                    <!-- Add Notes Form -->
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'recruitment-add-notes' caregiver.id %}">
+                        {% csrf_token %}
+                        <div class="input-container">
+                            <label for="file-upload" class="attachment-icon">
+                                <i class="fas fa-paperclip"></i>
+                            </label>
+                            <input id="file-upload" type="file" name="files">
+                            <textarea id="notes" name="notes" rows="2" placeholder="Write your note here"></textarea>
+                            <button type="submit" class="send-button">
+                                <i class="ni ni-send"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Notes Timeline -->
+                    <div class="timeline mt-4">
+                        {% if notes %}
                             {% for note in notes %}
-                                <li class="list-group-item">
+                            <div class="timeline-block mb-3">
+                                <span class="timeline-step badge-success">
+                                    <i class="ni ni-single-copy-04"></i>
+                                </span>
+                                <div class="timeline-content">
+                                    <h6 class="text-sm font-weight-bold">Note</h6>
                                     <p>{{ note.notes }}</p>
                                     {% if note.file %}
-                                        <a href="{{ note.file.url }}" target="_blank">Download Attached File</a>
+                                    <a href="{{ note.file.url }}" target="_blank">Download File</a>
                                     {% endif %}
-                                    <small class="text-muted">Added on: {{ note.created_at }}</small>
-                                </li>
+                                    <small class="text-muted">{{ note.created_at|date:"Y-m-d H:i" }}</small>
+                                </div>
+                            </div>
                             {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">No notes available for this caregiver.</p>
-                    {% endif %}
+                        {% else %}
+                            <p class="text-muted">No notes available for this caregiver.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Input Container Styling */
+    .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        padding: 5px;
+    }
+
+    /* Textarea Styling */
+    .input-container textarea {
+        resize: none;
+        width: 100%;
+        border: none;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: transparent;
+        outline: none;
+        font-size: 14px;
+        color: #495057;
+    }
+
+    /* Attachment Icon Styling */
+    .attachment-icon {
+        position: absolute;
+        left: 10px;
+        font-size: 18px;
+        color: #5e72e4;
+        cursor: pointer;
+    }
+
+    /* Hidden File Input */
+    #file-upload {
+        display: none;
+    }
+
+    /* Send Button Styling */
+    .send-button {
+        position: absolute;
+        right: 10px;
+        background-color: #5e72e4;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .send-button i {
+        color: white;
+        font-size: 16px;
+    }
+
+    .send-button:hover {
+        background-color: #4a63c6;
+    }
+
+    /* Timeline Styling */
+    .timeline {
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .timeline-block {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .timeline-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #5e72e4;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 18px;
+    }
+
+    .timeline-content {
+        background-color: #f8f9fa;
+        border: 1px solid #e3e3e3;
+        border-radius: 8px;
+        padding: 15px;
+        width: 100%;
+        position: relative;
+    }
+
+    .timeline-content h6 {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #5e72e4;
+    }
+
+    .timeline-content p {
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: #495057;
+    }
+
+    .timeline-content a {
+        font-size: 12px;
+        color: #5e72e4;
+        text-decoration: underline;
+    }
+
+    .timeline-content a:hover {
+        color: #4a63c6;
+    }
+
+    .timeline-content small {
+        display: block;
+        font-size: 12px;
+        color: #8898aa;
+        margin-top: 5px;
+    }
+</style>
 {% endblock content %}
+

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Companion - Join Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Merriweather', serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #444;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #F15A53;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #a5679c;
+        }
+
+        .btn-secondary {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ccc;
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #F15A53;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <h1>Welcome to Eldy</h1>
+        <h2>Fill out your profile step by step</h2>
+        <form id="helloCompanionForm" method="POST">
+            {% csrf_token %}
+            <!-- Step 1 -->
+            <div class="form-step active" id="step1">
+                <div class="form-group">
+                    <label for="name">What is your name?</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="country_of_origin">What is your country of origin?</label>
+                    <input type="text" id="country_of_origin" name="country_of_origin" placeholder="Enter your country of origin" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="form-step" id="step2">
+                <div class="form-group">
+                    <label for="age">What is your age?</label>
+                    <input type="number" id="age" name="age" placeholder="Enter your age" required>
+                </div>
+                <div class="form-group">
+                    <label for="current_location">Where are you currently located?</label>
+                    <input type="text" id="current_location" name="current_location" placeholder="Enter your current location" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="form-step" id="step3">
+                <div class="form-group">
+                    <label for="experience">How many years of experience do you have?</label>
+                    <input type="number" id="experience" name="experience" placeholder="Enter your experience in years" required>
+                </div>
+                <div class="form-group">
+                    <label for="professional_training">Do you have professional training?</label>
+                    <input type="checkbox" id="professional_training" name="professional_training">
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="form-step" id="step4">
+                <div class="form-group">
+                    <label for="salary_expectation">What is your expected salary?</label>
+                    <input type="number" id="salary_expectation" name="salary_expectation" placeholder="Enter your expected salary" required>
+                </div>
+                <div class="form-group">
+                    <label for="house_services">Are you comfortable providing house services?</label>
+                    <input type="checkbox" id="house_services" name="house_services">
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="form-step" id="step5">
+                <div class="form-group">
+                    <label for="mental_health_acceptance">Are you open to working with clients who have mental health challenges?</label>
+                    <input type="checkbox" id="mental_health_acceptance" name="mental_health_acceptance">
+                </div>
+                <div class="form-group">
+                    <label for="location_preference">What is your preferred work location?</label>
+                    <input type="text" id="location_preference" name="location_preference" placeholder="Enter your preferred location">
+                </div>
+                <div class="form-group">
+                    <label for="email">What is your email address?</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">What is your phone number?</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const steps = document.querySelectorAll('.form-step');
+        const progressBar = document.getElementById('progressBarFill');
+
+        function updateProgressBar() {
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showStep(stepIndex) {
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === stepIndex);
+            });
+            updateProgressBar();
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+    </script>
+</body>
+</html>

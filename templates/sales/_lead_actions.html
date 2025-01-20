@@ -1,62 +1,153 @@
-<div class="btn-group">
-    <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Actions
+{% load static %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<div class="d-flex justify-content-end align-items-center">
+    <!-- Schedule Consultation Button for Prospecting Stage -->
+    {% if lead.stage == "Prospecting" %}
+    <button type="button" class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#calendar-modal">
+        Schedule Consultation
     </button>
-    <div class="dropdown-menu dropdown-menu-right">
-        <!-- Start Consultation -->
-        {% if lead.stage == "Consultation Scheduled" %}
-        <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
-        {% endif %}
+    {% endif %}
 
-        <!-- Schedule Caregiver Interview -->
-        {% if lead.stage == "Under Consideration" %}
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
-            Schedule Caregiver Interview
+    <!-- Actions Dropdown -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Actions
         </button>
-        {% endif %}
+        <div class="dropdown-menu dropdown-menu-right">
+            <!-- Start Consultation -->
+            {% if lead.stage == "Consultation Scheduled" %}
+            <a class="dropdown-item" href="{% url 'start-consultation-form' lead.id %}">Start Consultation Form</a>
+            {% endif %}
 
-        <!-- Schedule Another Caregiver Interview -->
-        {% if lead.stage == "Caregiver Interview Scheduled" %}
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
-            Schedule Another Caregiver Interview
-        </button>
-        {% endif %}
+            <!-- Schedule Caregiver Interview -->
+            {% if lead.stage == "Under Consideration" %}
+            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
+                Schedule Caregiver Interview
+            </button>
+            {% endif %}
 
-        <!-- Move to Active Client -->
-        {% if lead.stage == "Caregiver Consideration" %}
-        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#start-service-modal">
-            Move to Active Client
-        </button>
-        {% endif %}
+            <!-- Schedule Another Caregiver Interview -->
+            {% if lead.stage == "Caregiver Interview Scheduled" %}
+            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#caregiver-interview-modal">
+                Schedule Another Caregiver Interview
+            </button>
+            {% endif %}
 
-        <!-- Render Next Action -->
-        {% if next_action_label and next_stage and next_stage != "Caregiver Interview Scheduled" %}
-        <form method="POST" action="{% url 'update-stage' lead.id next_stage %}" class="d-inline-block">
-            {% csrf_token %}
-            <button type="submit" class="dropdown-item">{{ next_action_label }}</button>
-        </form>
-        {% endif %}
+            <!-- Move to Active Client -->
+            {% if lead.stage == "Caregiver Consideration" %}
+            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#start-service-modal">
+                Move to Active Client
+            </button>
+            {% endif %}
 
-        <!-- Move to Under Consideration -->
-        {% if lead.stage == "New Lead" %}
-        <form method="POST" action="{% url 'update-stage' lead.id 'Under Consideration' %}">
-            {% csrf_token %}
-            <button type="submit" class="dropdown-item">Move to Under Consideration</button>
-        </form>
-        {% endif %}
+            <!-- Previous Stage -->
+            {% if previous_stage %}
+            <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
+            </form>
+            {% endif %}
 
-        <!-- Previous Stage -->
-        {% if previous_stage %}
-        <form method="POST" action="{% url 'update-stage' lead.id previous_stage %}">
-            {% csrf_token %}
-            <button type="submit" class="dropdown-item">Move to {{ previous_stage }}</button>
-        </form>
-        {% endif %}
-
-        <!-- Archive -->
-        <form method="POST" action="{% url 'archive-lead' lead.id %}">
-            {% csrf_token %}
-            <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
-        </form>
+            <!-- Archive -->
+            <form method="POST" action="{% url 'archive-lead' lead.id %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">Archive Lead</button>
+            </form>
+        </div>
     </div>
 </div>
+
+<!-- Modal for Scheduling Consultation -->
+<div class="modal fade" id="calendar-modal" tabindex="-1" role="dialog" aria-labelledby="calendar-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendar-modal-label">Select Consultation Date and Time</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Datepicker for Date and Time -->
+                <div>
+                    <label for="selected-date">Select Date</label>
+                    <input type="text" id="selected-date" class="form-control">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="selected-time">Select Time</label>
+                    <input type="text" id="selected-time" class="form-control">
+                </div>
+                <p id="selected-date-text" class="mt-2">You have selected: None</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-consultation" disabled>Save Consultation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const saveButton = document.getElementById('save-consultation');
+    const dateInput = document.getElementById('selected-date');
+    const timeInput = document.getElementById('selected-time');
+    const selectedDateText = document.getElementById('selected-date-text');
+    const leadId = "{{ lead.id }}";  // Pass lead ID dynamically
+
+    // Initialize Flatpickr
+    flatpickr("#selected-date", { dateFormat: "Y-m-d", minDate: "today" });
+    flatpickr("#selected-time", { enableTime: true, noCalendar: true, dateFormat: "H:i" });
+
+    // Enable Save button when both fields are filled
+    function updateSaveButtonState() {
+        if (dateInput.value && timeInput.value) {
+            saveButton.disabled = false;
+            selectedDateText.textContent = `You have selected: ${dateInput.value} at ${timeInput.value}`;
+        } else {
+            saveButton.disabled = true;
+            selectedDateText.textContent = "You have selected: None";
+        }
+    }
+
+    dateInput.addEventListener('change', updateSaveButtonState);
+    timeInput.addEventListener('change', updateSaveButtonState);
+
+    // Save consultation date and time
+    saveButton.addEventListener('click', function () {
+        const selectedDate = dateInput.value;
+        const selectedTime = timeInput.value;
+        const consultationDatetime = `${selectedDate}T${selectedTime}:00`;
+
+        if (!selectedDate || !selectedTime) {
+            alert('Please select both date and time.');
+            return;
+        }
+
+        // Send data to backend
+        fetch(`/sales-pipeline/update_consultation/${leadId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ consultation_datetime: consultationDatetime }),
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to save consultation.');
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                window.location.href = `/sales-pipeline/lead_profile/${leadId}/`;
+            } else if (data.error) {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>

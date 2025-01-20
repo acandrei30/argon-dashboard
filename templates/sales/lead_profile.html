@@ -9,22 +9,26 @@
 {% block title %} Lead Profile {% endblock title %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Header Section with Lead Info -->
-    <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-7">
-            <h1 class="text-primary d-inline">{{ lead.name }}</h1>
-            <span class="badge badge-info">{{ lead.stage }}</span>
-        </div>
-        <div class="col-lg-6 col-5 text-right">
-
-            <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-primary">
-                <i class="ni ni-bold-left"></i> Back to Pipeline
-            </a>
-            {% include 'sales/_lead_actions.html' %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h1 class="text-white d-inline">{{ lead.name }}</h1>
+                    <span class="badge badge-info">{{ lead.stage }}</span>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="{% url 'sales-pipeline' %}" class="btn btn-sm btn-neutral">
+                        <i class="ni ni-bold-left"></i> Back to Pipeline
+                    </a>
+                    {% include 'sales/_lead_actions.html' %}
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
+<div class="container-fluid mt--6">
     <div class="row">
         <!-- First Column: Lead Details -->
         <div class="col-md-4">

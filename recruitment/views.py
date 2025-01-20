@@ -136,3 +136,45 @@ def add_notes(request, caregiver_id):
 
         return redirect("caregiver_profile", caregiver_id=caregiver.id)
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+def hello_companion(request):
+    if request.method == 'POST':
+        # Extract form data from POST request
+        name = request.POST.get('name')
+        age = request.POST.get('age')
+        experience = request.POST.get('experience')
+        salary_expectation = request.POST.get('salary_expectation')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        country_of_origin = request.POST.get('country_of_origin')
+        current_location = request.POST.get('current_location')
+        professional_training = request.POST.get('professional_training') == 'on'
+        house_services = request.POST.get('house_services')
+        mental_health_acceptance = request.POST.get('mental_health_acceptance') == 'on'
+        location_preference = request.POST.get('location_preference')
+
+        # Create and save a new caregiver instance
+        caregiver = Caregiver.objects.create(
+            name=name,
+            age=age,
+            experience=experience,
+            salary_expectation=salary_expectation,
+            email=email,
+            phone=phone,
+            country_of_origin=country_of_origin,
+            current_location=current_location,
+            professional_training=professional_training,
+            house_services=house_services,
+            mental_health_acceptance=mental_health_acceptance,
+            location_preference=location_preference,
+        )
+
+        # Redirect to a thank-you page or confirmation
+        return redirect('thank_you')  # Ensure a thank_you view is set up
+
+    # Render the hello_companion form
+    return render(request, 'recruitment/hello_companion.html')
+
+def thank_you(request):
+    return render(request, 'recruitment/thank_you.html')
